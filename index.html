@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clearwater Beach 2027 — Rental Options</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<style>
+  :root{
+    --teal-deep:#163B3D;
+    --teal-mid:#1F5257;
+    --seafoam:#8FC0B9;
+    --sand:#F4ECDA;
+    --sand-card:#FFFFFF;
+    --coral:#E2683F;
+    --coral-dark:#C24F2B;
+    --ink:#22302F;
+    --ink-soft:#5A6B69;
+    --line:#DCD2B8;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--sand);
+    color:var(--ink);
+    font-family:Arial,Helvetica,sans-serif;
+    line-height:1.45;
+  }
+  h1,h2,h3,.display{
+    font-family:Arial,Helvetica,sans-serif;
+    color:var(--teal-deep);
+    margin:0;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    background:linear-gradient(135deg,var(--teal-deep),var(--teal-mid));
+    padding:2.2rem 1.5rem 1.6rem;
+    color:#fff;
+  }
+  .header-inner{
+    max-width:1180px;
+    margin:0 auto;
+  }
+  header h1{
+    color:#fff;
+    font-size:clamp(1.7rem,3.2vw,2.4rem);
+    font-weight:600;
+    letter-spacing:-0.01em;
+  }
+  header p.sub{
+    margin:.5rem 0 0;
+    color:var(--seafoam);
+    font-size:1.02rem;
+    max-width:640px;
+  }
+  .title-row{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:.9rem;
+  }
+  .btn-refresh{
+    background:var(--coral);
+    color:#fff;
+    border:1.5px solid var(--coral);
+    font-size:.85rem;
+    font-weight:600;
+    padding:.5rem .9rem;
+    border-radius:999px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:.4rem;
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .btn-refresh:hover{ background:var(--coral-dark); border-color:var(--coral-dark); }
+  .btn-refresh:disabled{ opacity:.6; cursor:default; }
+  .refresh-icon{
+    display:inline-block;
+    font-size:1rem;
+    line-height:1;
+  }
+  .refresh-icon.spinning{
+    animation:spin 0.9s linear infinite;
+  }
+  @keyframes spin{
+    from{ transform:rotate(0deg); }
+    to{ transform:rotate(360deg); }
+  }
+  .refresh-status{
+    margin:.6rem 0 0;
+    font-size:.85rem;
+    color:#fff;
+    background:rgba(255,255,255,0.12);
+    border-radius:8px;
+    padding:.45rem .7rem;
+    display:none;
+    max-width:640px;
+  }
+  .refresh-status.show{ display:block; }
+  .last-updated{
+    margin:.3rem 0 0;
+    font-size:.8rem;
+    color:var(--seafoam);
+  }
+  .last-updated .dot{
+    display:inline-block;
+    width:7px;height:7px;
+    border-radius:50%;
+    background:#6FCF97;
+    margin-right:.4rem;
+    vertical-align:middle;
+  }
+  .last-updated.stale .dot{ background:#E2683F; }
+
+  /* ---------- Filter bar ---------- */
+  .filter-bar{
+    max-width:1180px;
+    margin:1.4rem auto 0;
+    padding:0 1.5rem;
+    display:flex;
+    flex-wrap:wrap;
+    gap:.6rem;
+    align-items:center;
+  }
+  .filter-label{
+    font-size:.85rem;
+    color:var(--seafoam);
+    margin-right:.3rem;
+    font-weight:500;
+  }
+  .chip{
+    background:rgba(255,255,255,0.08);
+    border:1.5px solid rgba(255,255,255,0.35);
+    color:#fff;
+    padding:.55rem 1.1rem;
+    border-radius:999px;
+    font-size:.92rem;
+    font-weight:500;
+    cursor:pointer;
+    transition:background .15s ease, transform .1s ease;
+    font-family:inherit;
+  }
+  .chip:hover{ background:rgba(255,255,255,0.18); }
+  .chip.active{
+    background:var(--coral);
+    border-color:var(--coral);
+  }
+  .chip:focus-visible, .btn:focus-visible, .card:focus-visible{
+    outline:3px solid #fff;
+    outline-offset:2px;
+  }
+  .filter-note{
+    max-width:1180px;
+    margin:.7rem auto 0;
+    padding:0 1.5rem;
+    color:var(--seafoam);
+    font-size:.85rem;
+  }
+
+  /* ---------- Layout ---------- */
+  .layout{
+    max-width:1180px;
+    margin:1.6rem auto 3rem;
+    padding:0 1.5rem;
+    display:grid;
+    grid-template-columns:1fr 1.4fr;
+    gap:1.4rem;
+    align-items:start;
+  }
+  @media (max-width:880px){
+    .layout{ grid-template-columns:1fr; }
+  }
+
+  #map{
+    height:560px;
+    border-radius:var(--radius);
+    border:1px solid var(--line);
+    box-shadow:0 6px 18px rgba(22,59,61,0.12);
+  }
+  @media (max-width:880px){
+    #map{ height:380px; }
+  }
+
+  .list-col{
+    display:flex;
+    flex-direction:column;
+    gap:.9rem;
+    max-height:560px;
+    overflow-y:auto;
+    padding-right:.2rem;
+  }
+  @media (max-width:880px){
+    .list-col{ max-height:none; overflow-y:visible; }
+  }
+
+  .card{
+    background:var(--sand-card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:1rem 1.1rem;
+    cursor:pointer;
+    transition:box-shadow .15s ease, transform .1s ease, border-color .15s ease;
+  }
+  .card:hover{
+    box-shadow:0 6px 16px rgba(22,59,61,0.14);
+    border-color:var(--seafoam);
+  }
+  .card.dimmed{
+    opacity:.4;
+    pointer-events:none;
+  }
+  .card-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:.6rem;
+  }
+  .pin-badge{
+    flex:0 0 auto;
+    width:26px;height:26px;
+    border-radius:50%;
+    background:var(--teal-deep);
+    color:#fff;
+    font-size:.78rem;
+    font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .card h3{
+    font-size:1.08rem;
+    font-weight:600;
+    line-height:1.25;
+  }
+  .card .addr{
+    color:var(--ink-soft);
+    font-size:.83rem;
+    margin-top:.15rem;
+  }
+  .specs{
+    color:var(--ink-soft);
+    font-size:.83rem;
+    margin-top:.4rem;
+  }
+  .prices{
+    margin-top:.6rem;
+    display:flex;
+    flex-direction:column;
+    gap:.25rem;
+  }
+  .price-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:.5rem;
+    font-size:.87rem;
+    padding:.4rem .5rem;
+    border-radius:8px;
+    background:var(--sand);
+  }
+  .price-row.match{
+    background:#EAF4EE;
+  }
+  .price-row-info{
+    display:flex;
+    flex-direction:column;
+    gap:.1rem;
+    min-width:0;
+  }
+  .price-row-info .date-label{
+    font-weight:600;
+    color:var(--ink);
+  }
+  .price-row-info .platform-tag{
+    font-size:.76rem;
+    color:var(--ink-soft);
+  }
+  .price-row-actions{
+    display:flex;
+    align-items:center;
+    gap:.5rem;
+    flex:0 0 auto;
+  }
+  .price-row .amt{
+    font-weight:700;
+    color:var(--teal-deep);
+    white-space:nowrap;
+  }
+  .price-row.na .amt{
+    color:var(--ink-soft);
+    font-weight:500;
+  }
+  .row-link{
+    font-size:.8rem;
+    font-weight:600;
+    color:var(--coral-dark);
+    text-decoration:none;
+    white-space:nowrap;
+  }
+  .row-link:hover{ text-decoration:underline; }
+  .row-icon-btn{
+    font-family:inherit;
+    font-size:.85rem;
+    line-height:1;
+    background:transparent;
+    border:1.5px solid var(--line);
+    border-radius:6px;
+    color:var(--teal-mid);
+    cursor:pointer;
+    padding:.2rem .4rem;
+  }
+  .row-icon-btn:hover{ border-color:var(--seafoam); }
+  .card-actions{
+    margin-top:.7rem;
+    display:flex;
+    gap:.5rem;
+    flex-wrap:wrap;
+  }
+  .btn{
+    font-family:inherit;
+    font-size:.83rem;
+    font-weight:600;
+    padding:.5rem .85rem;
+    border-radius:8px;
+    border:none;
+    cursor:pointer;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:.35rem;
+  }
+  .btn-primary{
+    background:var(--coral);
+    color:#fff;
+  }
+  .btn-primary:hover{ background:var(--coral-dark); }
+  .btn-secondary{
+    background:transparent;
+    color:var(--teal-mid);
+    border:1.5px solid var(--line);
+  }
+  .btn-secondary:hover{ border-color:var(--seafoam); }
+
+  /* ---------- Popup ---------- */
+  .leaflet-popup-content-wrapper{
+    border-radius:12px;
+  }
+  .popup-inner h3{ font-size:1rem; margin-bottom:.2rem; }
+  .popup-inner .addr{ color:var(--ink-soft); font-size:.8rem; margin-bottom:.4rem; }
+  .popup-inner .prices{ margin-bottom:.5rem; }
+  .popup-inner .price-row{ font-size:.82rem; }
+
+  /* ---------- Side drawer ---------- */
+  .drawer-overlay{
+    position:fixed; inset:0;
+    background:rgba(22,30,29,0.35);
+    opacity:0; pointer-events:none;
+    transition:opacity .18s ease;
+    z-index:900;
+  }
+  .drawer-overlay.open{ opacity:1; pointer-events:auto; }
+  .drawer{
+    position:fixed;
+    top:0; right:0;
+    width:min(440px,100vw);
+    height:100vh;
+    background:#fff;
+    box-shadow:-8px 0 24px rgba(0,0,0,0.18);
+    transform:translateX(100%);
+    transition:transform .22s ease;
+    z-index:901;
+    display:flex;
+    flex-direction:column;
+  }
+  .drawer.open{ transform:translateX(0); }
+  .drawer-head{
+    padding:1rem 1.1rem;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:var(--teal-deep);
+    color:#fff;
+  }
+  .drawer-head h3{ color:#fff; font-size:1.02rem; }
+  .drawer-close{
+    background:none;border:none;color:#fff;
+    font-size:1.4rem;cursor:pointer;line-height:1;
+    padding:.2rem .4rem;
+  }
+  .drawer-note{
+    padding:.75rem 1.1rem;
+    font-size:.82rem;
+    color:var(--ink-soft);
+    background:var(--sand);
+    border-bottom:1px solid var(--line);
+  }
+  .drawer-note a{ color:var(--coral-dark); font-weight:600; }
+  .drawer iframe{
+    flex:1;
+    border:none;
+    width:100%;
+  }
+
+  footer{
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:.8rem;
+    padding:1rem 1.5rem 2.5rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="title-row">
+      <h1>Clearwater Beach, Summer 2027</h1>
+      <button class="btn btn-refresh" id="refreshBtn" title="Re-check pricing">
+        <span class="refresh-icon" id="refreshIcon">&#8635;</span> Refresh Pricing
+      </button>
+    </div>
+    <p class="sub">Every rental option we've found so far, mapped and priced for our two candidate weeks. Tap a pin or a card to see the listing.</p>
+    <p class="last-updated" id="lastUpdated"><span class="dot"></span>Checking price freshness…</p>
+    <p class="refresh-status" id="refreshStatus" aria-live="polite"></p>
+  </div>
+  <div class="filter-bar">
+    <span class="filter-label">Show me:</span>
+    <button class="chip active" data-range="all">Both weeks</button>
+    <button class="chip" data-range="r1">May 31 – Jun 5</button>
+    <button class="chip" data-range="r2">Jun 7 – Jun 12</button>
+  </div>
+  <p class="filter-note" id="filterNote">Showing all 12 options across both weeks.</p>
+</header>
+
+<div class="layout">
+  <div class="list-col" id="listCol"></div>
+  <div id="map"></div>
+  <div id="mapErrorMsg" style="display:none;padding:1rem;background:#FBEAEA;border:1px solid #E2683F;border-radius:14px;color:#22302F;font-size:.9rem;">
+    The map library couldn't load (probably a blocked network request in this preview). Try opening this file directly in your browser instead of viewing it inline — the map and links will work normally.
+  </div>
+</div>
+
+<footer>Prices checked live on each listing site on Oct 3, 2026 — always confirm on the listing before booking, as rates can change.</footer>
+
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <h3 id="drawerTitle">Listing</h3>
+    <button class="drawer-close" id="drawerClose" aria-label="Close">&times;</button>
+  </div>
+  <div class="drawer-note">Some sites won't display inside this panel. If it looks blank, use <a id="drawerFallbackLink" href="#" target="_blank" rel="noopener">open in a new tab</a> instead.</div>
+  <iframe id="drawerFrame" title="Listing preview"></iframe>
+</div>
+
+<script>
+const RANGE_LABELS = { r1: "May 31 – Jun 5", r2: "Jun 7 – Jun 12" };
+
+// Each property can be listed on more than one platform at different prices
+// (we've seen Airbnb beat Vrbo for one week and lose to it the next on the
+// same house). "offers" keeps every link we have per date range; the page
+// picks the cheapest one to display but keeps the rest in the data so a
+// future price refresh just means editing numbers here — no restructuring.
+const properties = [
+  { name:"North Beach Triplex", addr:"963 Mandalay Ave, Clearwater, FL 33767",
+    beds:8, baths:5, amenity:"Pool", fallback:[28.000500818655063,-82.82609675542467],
+    offers:{
+      r1:[
+        { platform:"Airbnb", price:9691, url:"https://www.airbnb.com/rooms/49227396?check_in=2027-05-31&check_out=2027-06-05" },
+        { platform:"Vrbo", price:9842, url:"https://www.vrbo.com/2284892?chkin=2027-05-31&chkout=2027-06-05" }
+      ],
+      r2:[
+        { platform:"Airbnb", price:11389, url:"https://www.airbnb.com/rooms/49227396?check_in=2027-06-07&check_out=2027-06-12" },
+        { platform:"Vrbo", price:11063, url:"https://www.vrbo.com/2284892?chkin=2027-06-07&chkout=2027-06-12" }
+      ]
+    } },
+  { name:"Casa Del Mar", addr:"971 Eldorado Ave, Clearwater, FL 33767",
+    beds:6, baths:4, amenity:"Pool", fallback:[28.000716886230133,-82.82691719992422],
+    offers:{
+      r1:[{ platform:"Direct", price:7009.20, url:"https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-05-31&co=2027-06-05" }],
+      r2:[{ platform:"Direct", price:7808.97, url:"https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-06-07&co=2027-06-12" }]
+    } },
+  { name:"Island Time", addr:"22 Laurel St, Clearwater, FL 33767",
+    beds:6, baths:4, amenity:"Pool", fallback:[27.999657846405757,-82.82682132238308],
+    offers:{
+      r1:[
+        { platform:"Airbnb", price:8768, url:"https://www.airbnb.com/rooms/16474734?check_in=2027-05-31&check_out=2027-06-05" },
+        { platform:"Vrbo", price:11028, url:"https://www.vrbo.com/3247385ha?chkin=2027-05-31&chkout=2027-06-05" },
+        { platform:"Direct", price:9526.23, url:"https://sunnyorangestays.com/properties/island-time/?ci=2027-05-31&co=2027-06-05" },
+        { platform:"Whimstay", price:10064, url:"https://www.whimstay.com/detail/Island-Time-Huge-Pool-Home-Sleeps-18-Cabana-Bar-Steps-to-Beach-22-Laurel/dbe4be71a173998f90b416de48b18adf?check_in=2027-05-31&check_out=2027-06-05" }
+      ],
+      r2:[
+        { platform:"Direct", price:10201.64, url:"https://sunnyorangestays.com/properties/island-time/?ci=2027-06-07&co=2027-06-12" },
+        { platform:"Whimstay", price:10776, url:"https://www.whimstay.com/detail/Island-Time-Huge-Pool-Home-Sleeps-18-Cabana-Bar-Steps-to-Beach-22-Laurel/dbe4be71a173998f90b416de48b18adf?check_in=2027-06-07&check_out=2027-06-12" }
+      ]
+    } },
+  { name:"Summer Breeze", addr:"770 Mandalay Ave, Clearwater, FL 33767",
+    beds:7, baths:3, amenity:"Pool", fallback:[27.992983667588863,-82.8270712577568],
+    offers:{
+      r1:[
+        { platform:"Direct", price:8882.66, url:"https://sunnyorangestays.com/properties/summer-breeze/?ci=2027-05-31&co=2027-06-05" },
+        { platform:"Vrbo", price:10312, url:"https://www.vrbo.com/4349678ha?chkin=2027-05-31&chkout=2027-06-05" },
+        { platform:"Whimstay", price:9384, url:"https://www.whimstay.com/detail/Summer-Breeze-Beachside-Pool-Home-Tiki-Bar-Sleeps-20-770-Mandalay/1761826f997f8890245f515bad34aed8?check_in=2027-05-31&check_out=2027-06-05" }
+      ],
+      r2:[
+        { platform:"Direct", price:10242.02, url:"https://sunnyorangestays.com/properties/summer-breeze/?ci=2027-06-07&co=2027-06-12" },
+        { platform:"Vrbo", price:11876, url:"https://www.vrbo.com/4349678ha?chkin=2027-06-07&chkout=2027-06-12" },
+        { platform:"Whimstay", price:10816, url:"https://www.whimstay.com/detail/Summer-Breeze-Beachside-Pool-Home-Tiki-Bar-Sleeps-20-770-Mandalay/1761826f997f8890245f515bad34aed8?check_in=2027-06-07&check_out=2027-06-12" }
+      ]
+    } },
+  { name:"4-Bed Coastal Retreat", addr:"724 Mandalay Ave, Clearwater, FL 33767",
+    beds:4, baths:2, amenity:"Pool", fallback:[27.99098552264128,-82.82694752102778],
+    offers:{
+      r1:[{ platform:"Vrbo", price:4637, url:"https://www.vrbo.com/2564331?chkin=2027-05-31&chkout=2027-06-05" }],
+      r2:[{ platform:"Vrbo", price:5070, url:"https://www.vrbo.com/2564331?chkin=2027-06-07&chkout=2027-06-12" }]
+    } },
+  { name:"House & Cottage", addr:"847 Eldorado Ave, Clearwater, FL 33767",
+    beds:4, baths:3, amenity:"Hot tub", fallback:[27.995585042660206,-82.82752178649177],
+    offers:{
+      r1:[{ platform:"Airbnb", price:4272, url:"https://www.airbnb.com/rooms/52600497?check_in=2027-05-31&check_out=2027-06-05" }],
+      r2:[{ platform:"Airbnb", price:4760, url:"https://www.airbnb.com/rooms/52600497?check_in=2027-06-07&check_out=2027-06-12" }]
+    } },
+  { name:"Gulf Front Dreams Beachfront Home", addr:"864 Eldorado Ave, Clearwater, FL 33767",
+    beds:3, baths:2, amenity:"Small pool", fallback:[27.996439353573592,-82.82793760351754],
+    offers:{
+      r1:[{ platform:"Airbnb", price:6050, url:"https://www.airbnb.com/rooms/16283747?check_in=2027-05-31&check_out=2027-06-05" }],
+      r2:[]
+    } },
+  { name:"Starfish Beach House", addr:"18 Cambria St, Clearwater, FL 33767",
+    beds:3, baths:3, amenity:"Pool", fallback:[27.988661972498726,-82.82729870027256],
+    offers:{
+      r1:[
+        { platform:"Airbnb", price:4014, url:"https://www.airbnb.com/rooms/17822693?check_in=2027-05-31&check_out=2027-06-05" },
+        { platform:"Vrbo", price:4076, url:"https://www.vrbo.com/1036056?chkin=2027-05-31&chkout=2027-06-05" }
+      ],
+      r2:[]
+    } },
+  { name:"Coastal Beach Retreat", addr:"26 Cambria St, Clearwater, FL 33767",
+    beds:5, baths:3, amenity:"Pool", fallback:[27.98864308387402,-82.82694563693613],
+    offers:{
+      r1:[{ platform:"Airbnb", price:5528, url:"https://www.airbnb.com/rooms/1508125906855926055?check_in=2027-05-31&check_out=2027-06-05" }],
+      r2:[]
+    } },
+  { name:"Vista Del Mar", addr:"19532 Gulf Blvd, Indian Shores, FL 33785",
+    beds:6, baths:7, amenity:"Pool", fallback:[27.85325944760097,-82.84587280631597],
+    offers:{
+      r1:[
+        { platform:"Direct", price:11157.62, url:"https://clearwaterbeachrentals.guestybookings.com/en/properties/66c4e027e65c370013ea0b7d?checkIn=2027-05-31&checkOut=2027-06-05&adults=15" },
+        { platform:"Booking.com", price:11576, url:"https://www.booking.com/hotel/us/vista-del-mar-villa-by-goldencoastrentals.en-us.html?checkin=2027-05-31&checkout=2027-06-05&group_adults=15" }
+      ],
+      r2:[
+        { platform:"Direct", price:11859.35, url:"https://clearwaterbeachrentals.guestybookings.com/en/properties/66c4e027e65c370013ea0b7d?checkIn=2027-06-07&checkOut=2027-06-12&adults=15" }
+      ]
+    } },
+  { name:"Akoya House at The Gemma", addr:"19 Somerset St, Clearwater, FL 33767",
+    beds:5, baths:5, amenity:"Pool", fallback:[27.988947,-82.827269],
+    offers:{
+      r1:[{ platform:"Airbnb", price:12972, url:"https://www.airbnb.com/rooms/1126781564607655572?check_in=2027-05-31&check_out=2027-06-05" }],
+      r2:[{ platform:"Airbnb", price:13315, url:"https://www.airbnb.com/rooms/1126781564607655572?check_in=2027-06-07&check_out=2027-06-12" }]
+    } },
+  { name:"Pearl House at The Gemma", addr:"21 Somerset St, Clearwater, FL 33767",
+    beds:5, baths:5, amenity:"Pool", fallback:[27.988959,-82.827099],
+    offers:{
+      r1:[{ platform:"Airbnb", price:12972, url:"https://www.airbnb.com/rooms/1131137832485760959?check_in=2027-05-31&check_out=2027-06-05" }],
+      r2:[{ platform:"Airbnb", price:13315, url:"https://www.airbnb.com/rooms/1131137832485760959?check_in=2027-06-07&check_out=2027-06-12" }]
+    } }
+];
+
+const fmt = n => n==null ? null : "$" + Math.round(n).toLocaleString();
+
+// Airbnb and Vrbo both send security headers that block their pages from loading
+// inside anyone else's iframe — that's out of our control. Direct host sites
+// (like sunnyorangestays.com) don't set that restriction, so only offer the
+// side-panel option where it can actually succeed.
+function isEmbeddable(url){
+  return !/airbnb\.com|vrbo\.com|booking\.com|whimstay\.com|guestybookings\.com/i.test(url);
+}
+
+// Cheapest offer in an array, or null if there are none for that date range.
+function cheapest(offersArr){
+  if(!offersArr || !offersArr.length) return null;
+  return offersArr.reduce((a,b) => b.price < a.price ? b : a);
+}
+
+let currentFilter = "all";
+const mapAvailable = (typeof L !== "undefined");
+let map = null;
+
+if (!mapAvailable) {
+  document.getElementById('map').style.display = 'none';
+  document.getElementById('mapErrorMsg').style.display = 'block';
+} else {
+  map = L.map('map', { scrollWheelZoom:false }).setView([27.996,-82.828], 15);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom:19,
+    attribution:'Tiles &copy; Esri &mdash; Source: Esri, HERE, Garmin, OpenStreetMap contributors'
+  }).addTo(map);
+}
+
+function pinIcon(num, dimmed){
+  return L.divIcon({
+    className:'',
+    html:`<div style="
+      background:${dimmed ? '#B9C4C2' : '#E2683F'};
+      color:#fff;width:28px;height:28px;border-radius:50% 50% 50% 0;
+      transform:rotate(-45deg);
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 2px 6px rgba(0,0,0,0.3);
+      border:2px solid #fff;">
+      <span style="transform:rotate(45deg);font:700 12px Arial,Helvetica,sans-serif;">${num}</span>
+    </div>`,
+    iconSize:[28,28],
+    iconAnchor:[14,28],
+    popupAnchor:[0,-26]
+  });
+}
+
+// Computed once at load, not on every render: the cheapest offer per date
+// range for each property. Filtering/re-rendering just reads these instead
+// of re-scanning every offer array each time.
+properties.forEach((p,i) => {
+  p.idx = i+1;
+  p.lat = p.fallback[0];
+  p.lng = p.fallback[1];
+  p.best = {
+    r1: cheapest(p.offers.r1),
+    r2: cheapest(p.offers.r2)
+  };
+});
+
+function offerRowHtml(key, offer, propName, inPopup){
+  if(!offer){
+    // No valid rate for this date range — skip the row entirely rather than
+    // showing a "No rate" placeholder.
+    return '';
+  }
+  const highlight = currentFilter === key;
+  const sidePanel = isEmbeddable(offer.url)
+    ? (inPopup
+        ? `<button class="row-icon-btn" onclick="openDrawer('${encodeURIComponent(offer.url)}','${propName.replace(/'/g,"\\'")}')" title="Open in side panel" aria-label="Open in side panel">⇲</button>`
+        : `<button class="row-icon-btn" data-url="${encodeURIComponent(offer.url)}" data-name="${propName.replace(/"/g,'&quot;')}" title="Open in side panel" aria-label="Open in side panel">⇲</button>`)
+    : '';
+  return `<div class="price-row ${highlight ? 'match' : ''}">
+    <div class="price-row-info">
+      <span class="date-label">${RANGE_LABELS[key]}</span>
+      <span class="platform-tag">via ${offer.platform}</span>
+    </div>
+    <div class="price-row-actions">
+      <span class="amt">${fmt(offer.price)}</span>
+      <a class="row-link" href="${offer.url}" target="_blank" rel="noopener">View ↗</a>
+      ${sidePanel}
+    </div>
+  </div>`;
+}
+
+function priceRowsHtml(p, inPopup){
+  const rows = offerRowHtml("r1", p.best.r1, p.name, inPopup) + offerRowHtml("r2", p.best.r2, p.name, inPopup);
+  if(rows) return rows;
+  return `<div class="price-row na"><span>No current rate available</span></div>`;
+}
+
+function matchesFilter(p){
+  if(currentFilter === "all") return true;
+  if(currentFilter === "r1") return p.best.r1 != null;
+  if(currentFilter === "r2") return p.best.r2 != null;
+  return true;
+}
+
+const markers = {};
+function buildMarkers(){
+  if(!mapAvailable) return;
+  properties.forEach(p=>{
+    const marker = L.marker([p.lat,p.lng], { icon: pinIcon(p.idx,false) }).addTo(map);
+    marker.bindPopup(popupHtml(p));
+    marker.on('click', ()=> highlightCard(p.idx));
+    markers[p.idx] = marker;
+  });
+}
+
+function popupHtml(p){
+  return `<div class="popup-inner">
+    <h3>${p.name}</h3>
+    <div class="addr">${p.addr} · ${p.beds} bd / ${p.baths} ba${p.amenity ? " · "+p.amenity : ""}</div>
+    <div class="prices">${priceRowsHtml(p, true)}</div>
+  </div>`;
+}
+
+function renderList(){
+  const col = document.getElementById('listCol');
+  col.innerHTML = "";
+  const sorted = [...properties].sort((a,b)=> a.idx - b.idx);
+  sorted.forEach(p=>{
+    const show = matchesFilter(p);
+    const card = document.createElement('div');
+    card.className = 'card' + (show ? '' : ' dimmed');
+    card.id = 'card-'+p.idx;
+    card.tabIndex = 0;
+    card.innerHTML = `
+      <div class="card-top">
+        <div>
+          <h3>${p.name}</h3>
+          <div class="addr">${p.addr}</div>
+        </div>
+        <div class="pin-badge">${p.idx}</div>
+      </div>
+      <div class="specs">${p.beds} bd · ${p.baths} ba${p.amenity ? " · "+p.amenity : ""}</div>
+      <div class="prices">${priceRowsHtml(p, false)}</div>
+      <div class="card-actions">
+        <button class="btn btn-secondary" data-panto="${p.idx}">Show on map</button>
+      </div>`;
+    col.appendChild(card);
+  });
+
+  col.querySelectorAll('[data-url]').forEach(btn=>{
+    btn.addEventListener('click', ()=> openDrawer(btn.dataset.url, btn.dataset.name));
+  });
+  col.querySelectorAll('[data-panto]').forEach(btn=>{
+    if(!mapAvailable){ btn.style.display = 'none'; return; }
+    btn.addEventListener('click', ()=>{
+      const p = properties.find(pp=>pp.idx == btn.dataset.panto);
+      map.setView([p.lat,p.lng], 17, { animate:true });
+      markers[p.idx].openPopup();
+    });
+  });
+}
+
+function highlightCard(idx){
+  document.querySelectorAll('.card').forEach(c=>c.style.borderColor='');
+  const el = document.getElementById('card-'+idx);
+  if(el){
+    el.style.borderColor = 'var(--coral)';
+    el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }
+}
+
+function updateMarkers(){
+  if(!mapAvailable) return;
+  properties.forEach(p=>{
+    const show = matchesFilter(p);
+    markers[p.idx].setIcon(pinIcon(p.idx, !show));
+    markers[p.idx].setOpacity(show ? 1 : 0.35);
+    markers[p.idx].setPopupContent(popupHtml(p));
+  });
+}
+
+document.querySelectorAll('.chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    currentFilter = chip.dataset.range;
+    const note = document.getElementById('filterNote');
+    if(currentFilter === 'all'){
+      note.textContent = "Showing the lowest available rate for each week, side by side.";
+    } else {
+      const count = properties.filter(p=>matchesFilter(p)).length;
+      note.textContent = `Highlighting the ${count} option${count===1?'':'s'} available for ${RANGE_LABELS[currentFilter]}. The rest are greyed out.`;
+    }
+    renderList();
+    updateMarkers();
+  });
+});
+
+// ---- Side drawer ----
+const drawer = document.getElementById('drawer');
+const overlay = document.getElementById('drawerOverlay');
+window.openDrawer = function(encodedUrl, name){
+  const url = decodeURIComponent(encodedUrl);
+  document.getElementById('drawerTitle').textContent = name;
+  document.getElementById('drawerFrame').src = url;
+  document.getElementById('drawerFallbackLink').href = url;
+  drawer.classList.add('open');
+  overlay.classList.add('open');
+};
+function closeDrawer(){
+  drawer.classList.remove('open');
+  overlay.classList.remove('open');
+  document.getElementById('drawerFrame').src = 'about:blank';
+}
+document.getElementById('drawerClose').addEventListener('click', closeDrawer);
+overlay.addEventListener('click', closeDrawer);
+
+// ---- Refresh Pricing ----
+// A GitHub Actions workflow (see .github/workflows/refresh-prices.yml) runs
+// on a schedule, re-checks every booking link with a real headless browser
+// server-side (so it isn't blocked by CORS the way this page's own
+// JavaScript would be), and commits the results to data/prices.json next
+// to this file. This page just fetches that JSON and overlays it onto the
+// snapshot baked in above. If the fetch fails for any reason — opened as a
+// local file instead of through the hosted link, the Action hasn't run
+// yet, a network hiccup — it quietly keeps showing the baked-in snapshot
+// instead of breaking, and says so plainly rather than pretending it's
+// live.
+const PRICES_URL = "data/prices.json";
+const BASELINE_VERIFIED = "Oct 3, 2026";
+const refreshBtn = document.getElementById('refreshBtn');
+const refreshIcon = document.getElementById('refreshIcon');
+const refreshStatus = document.getElementById('refreshStatus');
+const lastUpdatedEl = document.getElementById('lastUpdated');
+
+function applyPriceOverlay(offersByUrl){
+  let matched = 0;
+  properties.forEach(p=>{
+    ['r1','r2'].forEach(key=>{
+      (p.offers[key] || []).forEach(offer=>{
+        if(Object.prototype.hasOwnProperty.call(offersByUrl, offer.url)){
+          offer.price = offersByUrl[offer.url];
+          matched++;
+        }
+      });
+    });
+    p.best = { r1: cheapest(p.offers.r1), r2: cheapest(p.offers.r2) };
+  });
+  return matched;
+}
+
+function formatLocalTime(isoString){
+  try{
+    return new Date(isoString).toLocaleString(undefined, {
+      dateStyle:'medium', timeStyle:'short'
+    });
+  } catch(e){
+    return isoString;
+  }
+}
+
+async function runPriceCheck(isAuto){
+  refreshBtn.disabled = true;
+  refreshIcon.classList.add('spinning');
+  refreshStatus.classList.add('show');
+  refreshStatus.textContent = "Fetching the latest prices checked by the automated refresh…";
+
+  try{
+    const res = await fetch(PRICES_URL + "?t=" + Date.now(), { cache:"no-store" });
+    if(!res.ok) throw new Error("prices.json not available (status " + res.status + ")");
+    const data = await res.json();
+    const matched = applyPriceOverlay(data.offers || {});
+    renderList();
+    updateMarkers();
+
+    const when = formatLocalTime(data.updated);
+    lastUpdatedEl.classList.remove('stale');
+    lastUpdatedEl.innerHTML = `<span class="dot"></span>Prices last refreshed: ${when} (automated check, ${matched} rates loaded)`;
+    refreshStatus.textContent = "✓ Loaded the latest automated price check.";
+  } catch(err){
+    // No prices.json yet, or this copy was opened without the hosted
+    // link's server — fall back to what's baked into the page itself.
+    renderList();
+    updateMarkers();
+    lastUpdatedEl.classList.add('stale');
+    lastUpdatedEl.innerHTML = `<span class="dot"></span>Showing prices manually verified ${BASELINE_VERIFIED} — live refresh unavailable right now.`;
+    refreshStatus.textContent = isAuto
+      ? "Couldn't reach the automated price feed — showing the saved snapshot instead."
+      : "Still couldn't reach the automated price feed — showing the saved snapshot instead.";
+  }
+
+  refreshIcon.classList.remove('spinning');
+  refreshBtn.disabled = false;
+  setTimeout(()=>{ refreshStatus.classList.remove('show'); }, 6000);
+}
+
+refreshBtn.addEventListener('click', ()=> runPriceCheck(false));
+
+// ---- init ----
+buildMarkers();
+renderList();
+
+if(mapAvailable){
+  // Fit map to all markers initially
+  const group = L.featureGroup(Object.values(markers));
+  if(group.getBounds().isValid()) map.fitBounds(group.getBounds().pad(0.2));
+  // Coordinates above are confirmed exact addresses — no live geocoding needed or run.
+}
+
+// Load the latest automated price check as soon as the page opens.
+runPriceCheck(true);
+</script>
+
+</body>
+</html>
