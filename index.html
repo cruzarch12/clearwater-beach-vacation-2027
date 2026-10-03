@@ -115,6 +115,15 @@
     vertical-align:middle;
   }
   .last-updated.stale .dot{ background:#E2683F; }
+  .platform-note{
+    margin:.3rem 0 0;
+    font-size:.76rem;
+    color:var(--seafoam);
+    opacity:.9;
+    max-width:640px;
+    display:none;
+  }
+  .platform-note.show{ display:block; }
 
   /* ---------- Filter bar ---------- */
   .filter-bar{
@@ -424,6 +433,7 @@
     </div>
     <p class="sub">Every rental option we've found so far, mapped and priced for our two candidate weeks. Tap a pin or a card to see the listing.</p>
     <p class="last-updated" id="lastUpdated"><span class="dot"></span>Checking price freshness…</p>
+    <p class="platform-note" id="platformNote"></p>
     <p class="refresh-status" id="refreshStatus" aria-live="polite"></p>
   </div>
   <div class="filter-bar">
@@ -798,6 +808,27 @@ const refreshBtn = document.getElementById('refreshBtn');
 const refreshIcon = document.getElementById('refreshIcon');
 const refreshStatus = document.getElementById('refreshStatus');
 const lastUpdatedEl = document.getElementById('lastUpdated');
+const platformNoteEl = document.getElementById('platformNote');
+
+// Human-readable names for the hostnames that show up in platform_status.
+const PLATFORM_LABELS = {
+  "www.vrbo.com": "Vrbo",
+  "www.booking.com": "Booking.com",
+  "clearwaterbeachrentals.guestybookings.com": "Vista Del Mar's direct booking site",
+  "www.airbnb.com": "Airbnb",
+  "www.whimstay.com": "Whimstay",
+  "sunnyorangestays.com": "Direct (Sunny Orange Stays)"
+};
+
+function describePlatformStatus(platformStatus){
+  if(!platformStatus) return "";
+  const blockedPlatforms = Object.entries(platformStatus)
+    .filter(([, s]) => s.blocked > 0)
+    .map(([host]) => PLATFORM_LABELS[host] || host);
+  if(blockedPlatforms.length === 0) return "";
+  const list = blockedPlatforms.join(", ");
+  return `Heads up: ${list} ${blockedPlatforms.length === 1 ? "is" : "are"} currently showing a bot-check page to the automated checker instead of the real price, so ${blockedPlatforms.length === 1 ? "its" : "their"} numbers above may be out of date. Click "Open listing" on those to see the live price.`;
+}
 
 function applyPriceOverlay(offersByUrl){
   let matched = 0;
@@ -843,6 +874,14 @@ async function runPriceCheck(isAuto){
     lastUpdatedEl.classList.remove('stale');
     lastUpdatedEl.innerHTML = `<span class="dot"></span>Prices last refreshed: ${when} (automated check, ${matched} rates loaded)`;
     refreshStatus.textContent = "✓ Loaded the latest automated price check.";
+
+    const note = describePlatformStatus(data.platform_status);
+    if(note){
+      platformNoteEl.textContent = note;
+      platformNoteEl.classList.add('show');
+    } else {
+      platformNoteEl.classList.remove('show');
+    }
   } catch(err){
     // No prices.json yet, or this copy was opened without the hosted
     // link's server — fall back to what's baked into the page itself.
@@ -853,6 +892,7 @@ async function runPriceCheck(isAuto){
     refreshStatus.textContent = isAuto
       ? "Couldn't reach the automated price feed — showing the saved snapshot instead."
       : "Still couldn't reach the automated price feed — showing the saved snapshot instead.";
+    platformNoteEl.classList.remove('show');
   }
 
   refreshIcon.classList.remove('spinning');
