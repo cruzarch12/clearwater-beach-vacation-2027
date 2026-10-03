@@ -115,15 +115,6 @@
     vertical-align:middle;
   }
   .last-updated.stale .dot{ background:#E2683F; }
-  .platform-note{
-    margin:.3rem 0 0;
-    font-size:.76rem;
-    color:var(--seafoam);
-    opacity:.9;
-    max-width:640px;
-    display:none;
-  }
-  .platform-note.show{ display:block; }
 
   /* ---------- Filter bar ---------- */
   .filter-bar{
@@ -286,6 +277,10 @@
     font-size:.76rem;
     color:var(--ink-soft);
   }
+  .price-row-info .stale-note{
+    color:#C0392B;
+    font-weight:700;
+  }
   .price-row-actions{
     display:flex;
     align-items:center;
@@ -321,6 +316,19 @@
     padding:.2rem .4rem;
   }
   .row-icon-btn:hover{ border-color:var(--seafoam); }
+  .btn-select{
+    font-family:inherit;
+    font-size:.78rem;
+    font-weight:700;
+    background:var(--coral);
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    padding:.3rem .6rem;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .btn-select:hover{ background:var(--coral-dark); }
   .card-actions{
     margin-top:.7rem;
     display:flex;
@@ -413,6 +421,98 @@
     width:100%;
   }
 
+  /* ---------- Selection modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(22,30,29,0.45);
+    opacity:0; pointer-events:none;
+    transition:opacity .18s ease;
+    z-index:1000;
+  }
+  .modal-overlay.open{ opacity:1; pointer-events:auto; }
+  .select-modal{
+    position:fixed;
+    top:50%; left:50%;
+    width:min(420px,92vw);
+    max-height:88vh;
+    overflow-y:auto;
+    background:#fff;
+    border-radius:var(--radius);
+    box-shadow:0 20px 50px rgba(0,0,0,0.3);
+    transform:translate(-50%,-48%) scale(.97);
+    opacity:0;
+    pointer-events:none;
+    transition:transform .18s ease, opacity .18s ease;
+    z-index:1001;
+  }
+  .select-modal.open{ transform:translate(-50%,-50%) scale(1); opacity:1; pointer-events:auto; }
+  .select-modal-head{
+    padding:1rem 1.1rem;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:var(--teal-deep);
+    color:#fff;
+    border-radius:var(--radius) var(--radius) 0 0;
+  }
+  .select-modal-head h3{ color:#fff; font-size:1.02rem; }
+  .select-summary{
+    margin:0;
+    padding:.9rem 1.1rem 0;
+    font-size:.9rem;
+    color:var(--ink);
+  }
+  .select-summary strong{ color:var(--teal-deep); }
+  #selectForm{ padding:.6rem 1.1rem 1.1rem; }
+  .select-field-row{
+    display:flex;
+    gap:.6rem;
+    margin-top:.7rem;
+  }
+  .select-field{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:.25rem;
+    font-size:.8rem;
+    color:var(--ink-soft);
+    font-weight:600;
+  }
+  .select-field small{ font-weight:400; }
+  .select-field input{
+    font-family:inherit;
+    font-size:.95rem;
+    padding:.5rem .6rem;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    color:var(--ink);
+  }
+  .select-field input:focus{ outline:2px solid var(--seafoam); border-color:var(--seafoam); }
+  .select-error{
+    margin:.6rem 0 0;
+    font-size:.82rem;
+    color:#C0392B;
+    font-weight:600;
+    display:none;
+  }
+  .select-error.show{ display:block; }
+  .select-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:.6rem;
+    margin-top:1rem;
+  }
+  .select-success{
+    margin:0;
+    padding:0 1.1rem 1.1rem;
+    font-size:.88rem;
+    color:#1F7A4D;
+    font-weight:600;
+    display:none;
+  }
+  .select-success.show{ display:block; }
+
   footer{
     text-align:center;
     color:var(--ink-soft);
@@ -433,7 +533,6 @@
     </div>
     <p class="sub">Every rental option we've found so far, mapped and priced for our two candidate weeks. Tap a pin or a card to see the listing.</p>
     <p class="last-updated" id="lastUpdated"><span class="dot"></span>Checking price freshness…</p>
-    <p class="platform-note" id="platformNote"></p>
     <p class="refresh-status" id="refreshStatus" aria-live="polite"></p>
   </div>
   <div class="filter-bar">
@@ -463,6 +562,43 @@
   </div>
   <div class="drawer-note">Some sites won't display inside this panel. If it looks blank, use <a id="drawerFallbackLink" href="#" target="_blank" rel="noopener">open in a new tab</a> instead.</div>
   <iframe id="drawerFrame" title="Listing preview"></iframe>
+</div>
+
+<div class="modal-overlay" id="selectOverlay"></div>
+<div class="select-modal" id="selectModal" role="dialog" aria-modal="true" aria-labelledby="selectModalTitle">
+  <div class="select-modal-head">
+    <h3 id="selectModalTitle">Confirm your pick</h3>
+    <button class="drawer-close" id="selectModalClose" aria-label="Close">&times;</button>
+  </div>
+  <p class="select-summary" id="selectSummary"></p>
+  <form id="selectForm">
+    <div class="select-field-row">
+      <label class="select-field">
+        <span>First name</span>
+        <input type="text" id="selectFirstName" required autocomplete="given-name">
+      </label>
+      <label class="select-field">
+        <span>Last name</span>
+        <input type="text" id="selectLastName" required autocomplete="family-name">
+      </label>
+    </div>
+    <div class="select-field-row">
+      <label class="select-field">
+        <span>Adults</span>
+        <input type="number" id="selectAdults" min="0" max="30" value="1" required>
+      </label>
+      <label class="select-field">
+        <span>Children <small>(newborn–17)</small></span>
+        <input type="number" id="selectChildren" min="0" max="30" value="0" required>
+      </label>
+    </div>
+    <p class="select-error" id="selectError"></p>
+    <div class="select-actions">
+      <button type="button" class="btn btn-secondary" id="selectCancel">Cancel</button>
+      <button type="submit" class="btn btn-refresh" id="selectConfirm">Confirm Selection</button>
+    </div>
+  </form>
+  <p class="select-success" id="selectSuccess"></p>
 </div>
 
 <script>
@@ -647,20 +783,26 @@ function offerRowHtml(key, offer, propName, inPopup){
     return '';
   }
   const highlight = currentFilter === key;
+  const stale = blockedHosts.has(hostOf(offer.url));
   const sidePanel = isEmbeddable(offer.url)
     ? (inPopup
         ? `<button class="row-icon-btn" onclick="openDrawer('${encodeURIComponent(offer.url)}','${propName.replace(/'/g,"\\'")}')" title="Open in side panel" aria-label="Open in side panel">⇲</button>`
         : `<button class="row-icon-btn" data-url="${encodeURIComponent(offer.url)}" data-name="${propName.replace(/"/g,'&quot;')}" title="Open in side panel" aria-label="Open in side panel">⇲</button>`)
     : '';
+  const safeName = propName.replace(/'/g,"\\'");
+  const selectBtn = inPopup
+    ? `<button class="btn-select" onclick="openSelectionModal('${safeName}','${key}',${offer.price})">Select</button>`
+    : `<button class="btn-select" data-select-prop="${propName.replace(/"/g,'&quot;')}" data-select-range="${key}" data-select-price="${offer.price}">Select</button>`;
   return `<div class="price-row ${highlight ? 'match' : ''}">
     <div class="price-row-info">
       <span class="date-label">${RANGE_LABELS[key]}</span>
-      <span class="platform-tag">via ${offer.platform}</span>
+      <span class="platform-tag">via ${offer.platform}${stale ? ' <span class="stale-note">*** Price not current, open to view live price</span>' : ''}</span>
     </div>
     <div class="price-row-actions">
       <span class="amt">${fmt(offer.price)}</span>
       <a class="row-link" href="${offer.url}" target="_blank" rel="noopener">View ↗</a>
       ${sidePanel}
+      ${selectBtn}
     </div>
   </div>`;
 }
@@ -725,6 +867,9 @@ function renderList(){
 
   col.querySelectorAll('[data-url]').forEach(btn=>{
     btn.addEventListener('click', ()=> openDrawer(btn.dataset.url, btn.dataset.name));
+  });
+  col.querySelectorAll('[data-select-prop]').forEach(btn=>{
+    btn.addEventListener('click', ()=> openSelectionModal(btn.dataset.selectProp, btn.dataset.selectRange, parseFloat(btn.dataset.selectPrice)));
   });
   col.querySelectorAll('[data-panto]').forEach(btn=>{
     if(!mapAvailable){ btn.style.display = 'none'; return; }
@@ -791,6 +936,111 @@ function closeDrawer(){
 document.getElementById('drawerClose').addEventListener('click', closeDrawer);
 overlay.addEventListener('click', closeDrawer);
 
+// ---- Selection + RSVP capture ----
+// Submissions get posted to a tiny free Google Apps Script "web app" that
+// appends one row per confirmed pick to a Google Sheet Chris owns — see
+// README.md's "Collecting everyone's picks" section for how to stand that
+// up and paste the resulting URL in below. Until a real URL is pasted in,
+// submissions are kept local only (logged to the browser console) so the
+// page still works for browsing/testing without erroring out.
+const RESPONSES_URL = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+
+const selectOverlay = document.getElementById('selectOverlay');
+const selectModal = document.getElementById('selectModal');
+const selectForm = document.getElementById('selectForm');
+const selectSummary = document.getElementById('selectSummary');
+const selectError = document.getElementById('selectError');
+const selectSuccess = document.getElementById('selectSuccess');
+const selectConfirmBtn = document.getElementById('selectConfirm');
+let pendingSelection = null;
+
+window.openSelectionModal = function(propName, rangeKey, price){
+  pendingSelection = { property: propName, dateRange: RANGE_LABELS[rangeKey] || rangeKey, price: price };
+  selectSummary.innerHTML = `You're selecting <strong>${propName}</strong> for <strong>${RANGE_LABELS[rangeKey] || rangeKey}</strong> at <strong>${fmt(price)}</strong>. Confirm with your name and group size below.`;
+  selectForm.reset();
+  document.getElementById('selectAdults').value = 1;
+  document.getElementById('selectChildren').value = 0;
+  selectError.classList.remove('show');
+  selectSuccess.classList.remove('show');
+  selectForm.style.display = '';
+  selectOverlay.classList.add('open');
+  selectModal.classList.add('open');
+  document.getElementById('selectFirstName').focus();
+};
+
+function closeSelectionModal(){
+  selectOverlay.classList.remove('open');
+  selectModal.classList.remove('open');
+}
+document.getElementById('selectModalClose').addEventListener('click', closeSelectionModal);
+document.getElementById('selectCancel').addEventListener('click', closeSelectionModal);
+selectOverlay.addEventListener('click', closeSelectionModal);
+
+selectForm.addEventListener('submit', async (ev)=>{
+  ev.preventDefault();
+  selectError.classList.remove('show');
+
+  const firstName = document.getElementById('selectFirstName').value.trim();
+  const lastName = document.getElementById('selectLastName').value.trim();
+  const adults = parseInt(document.getElementById('selectAdults').value, 10);
+  const children = parseInt(document.getElementById('selectChildren').value, 10);
+
+  if(!firstName || !lastName){
+    selectError.textContent = "Please enter your first and last name.";
+    selectError.classList.add('show');
+    return;
+  }
+  if(!Number.isInteger(adults) || adults < 1){
+    selectError.textContent = "Please enter at least 1 adult.";
+    selectError.classList.add('show');
+    return;
+  }
+  if(!Number.isInteger(children) || children < 0){
+    selectError.textContent = "Please enter a valid number of children (0 is fine).";
+    selectError.classList.add('show');
+    return;
+  }
+
+  const payload = {
+    firstName, lastName,
+    adults, children,
+    property: pendingSelection.property,
+    dateRange: pendingSelection.dateRange,
+    price: pendingSelection.price,
+    submittedAt: new Date().toISOString()
+  };
+
+  selectConfirmBtn.disabled = true;
+  selectConfirmBtn.textContent = "Saving…";
+
+  try{
+    if(RESPONSES_URL.startsWith("PASTE_")){
+      // No collection endpoint configured yet — keep working locally
+      // instead of silently failing, so this is still testable before
+      // the Google Sheet step is set up.
+      console.log("Selection (no RESPONSES_URL configured yet):", payload);
+    } else {
+      // text/plain avoids a CORS preflight the Apps Script endpoint
+      // doesn't need to handle; the script parses JSON from the body.
+      await fetch(RESPONSES_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+    }
+    selectForm.style.display = 'none';
+    selectSuccess.textContent = `Thanks, ${firstName}! Your pick — ${pendingSelection.property}, ${pendingSelection.dateRange} — has been recorded.`;
+    selectSuccess.classList.add('show');
+    setTimeout(closeSelectionModal, 2200);
+  } catch(err){
+    selectError.textContent = "Couldn't save your selection — check your connection and try again.";
+    selectError.classList.add('show');
+  }
+
+  selectConfirmBtn.disabled = false;
+  selectConfirmBtn.textContent = "Confirm Selection";
+});
+
 // ---- Refresh Pricing ----
 // A GitHub Actions workflow (see .github/workflows/refresh-prices.yml) runs
 // on a schedule, re-checks every booking link with a real headless browser
@@ -808,26 +1058,14 @@ const refreshBtn = document.getElementById('refreshBtn');
 const refreshIcon = document.getElementById('refreshIcon');
 const refreshStatus = document.getElementById('refreshStatus');
 const lastUpdatedEl = document.getElementById('lastUpdated');
-const platformNoteEl = document.getElementById('platformNote');
 
-// Human-readable names for the hostnames that show up in platform_status.
-const PLATFORM_LABELS = {
-  "www.vrbo.com": "Vrbo",
-  "www.booking.com": "Booking.com",
-  "clearwaterbeachrentals.guestybookings.com": "Vista Del Mar's direct booking site",
-  "www.airbnb.com": "Airbnb",
-  "www.whimstay.com": "Whimstay",
-  "sunnyorangestays.com": "Direct (Sunny Orange Stays)"
-};
+// Hostnames whose automated check was blocked (bot-check/CAPTCHA page
+// instead of a real price) on the most recent refresh. offerRowHtml reads
+// this to flag the specific row as stale rather than banner text up top.
+let blockedHosts = new Set();
 
-function describePlatformStatus(platformStatus){
-  if(!platformStatus) return "";
-  const blockedPlatforms = Object.entries(platformStatus)
-    .filter(([, s]) => s.blocked > 0)
-    .map(([host]) => PLATFORM_LABELS[host] || host);
-  if(blockedPlatforms.length === 0) return "";
-  const list = blockedPlatforms.join(", ");
-  return `Heads up: ${list} ${blockedPlatforms.length === 1 ? "is" : "are"} currently showing a bot-check page to the automated checker instead of the real price, so ${blockedPlatforms.length === 1 ? "its" : "their"} numbers above may be out of date. Click "Open listing" on those to see the live price.`;
+function hostOf(url){
+  try { return new URL(url).host; } catch(e){ return ''; }
 }
 
 function applyPriceOverlay(offersByUrl){
@@ -848,8 +1086,11 @@ function applyPriceOverlay(offersByUrl){
 
 function formatLocalTime(isoString){
   try{
+    // timeZoneName:'short' renders the viewer's own local zone abbreviation
+    // (e.g. CDT in Dallas, EDT in Orlando) — whatever the device reports,
+    // never a hardcoded one.
     return new Date(isoString).toLocaleString(undefined, {
-      dateStyle:'medium', timeStyle:'short'
+      dateStyle:'medium', timeStyle:'short', timeZoneName:'short'
     });
   } catch(e){
     return isoString;
@@ -867,6 +1108,15 @@ async function runPriceCheck(isAuto){
     if(!res.ok) throw new Error("prices.json not available (status " + res.status + ")");
     const data = await res.json();
     const matched = applyPriceOverlay(data.offers || {});
+
+    // Build the blocked-host set BEFORE rendering, so each affected row
+    // shows its own "price not current" flag on this pass.
+    blockedHosts = new Set(
+      Object.entries(data.platform_status || {})
+        .filter(([, s]) => s.blocked > 0)
+        .map(([host]) => host)
+    );
+
     renderList();
     updateMarkers();
 
@@ -874,17 +1124,10 @@ async function runPriceCheck(isAuto){
     lastUpdatedEl.classList.remove('stale');
     lastUpdatedEl.innerHTML = `<span class="dot"></span>Prices last refreshed: ${when} (automated check, ${matched} rates loaded)`;
     refreshStatus.textContent = "✓ Loaded the latest automated price check.";
-
-    const note = describePlatformStatus(data.platform_status);
-    if(note){
-      platformNoteEl.textContent = note;
-      platformNoteEl.classList.add('show');
-    } else {
-      platformNoteEl.classList.remove('show');
-    }
   } catch(err){
     // No prices.json yet, or this copy was opened without the hosted
     // link's server — fall back to what's baked into the page itself.
+    blockedHosts = new Set();
     renderList();
     updateMarkers();
     lastUpdatedEl.classList.add('stale');
@@ -892,7 +1135,6 @@ async function runPriceCheck(isAuto){
     refreshStatus.textContent = isAuto
       ? "Couldn't reach the automated price feed — showing the saved snapshot instead."
       : "Still couldn't reach the automated price feed — showing the saved snapshot instead.";
-    platformNoteEl.classList.remove('show');
   }
 
   refreshIcon.classList.remove('spinning');
