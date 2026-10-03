@@ -34,5 +34,43 @@
     "https://www.whimstay.com/detail/Summer-Breeze-Beachside-Pool-Home-Tiki-Bar-Sleeps-20-770-Mandalay/1761826f997f8890245f515bad34aed8?check_in=2027-05-31&check_out=2027-06-05": 9384,
     "https://www.whimstay.com/detail/Summer-Breeze-Beachside-Pool-Home-Tiki-Bar-Sleeps-20-770-Mandalay/1761826f997f8890245f515bad34aed8?check_in=2027-06-07&check_out=2027-06-12": 10816
   },
-  "updated": "2026-10-03T14:47:48Z"
+  "platform_status": {
+    "clearwaterbeachrentals.guestybookings.com": {
+      "blocked": 0,
+      "checked": 2,
+      "ok": 0,
+      "other_failed": 2
+    },
+    "sunnyorangestays.com": {
+      "blocked": 0,
+      "checked": 6,
+      "ok": 6,
+      "other_failed": 0
+    },
+    "www.airbnb.com": {
+      "blocked": 0,
+      "checked": 12,
+      "ok": 12,
+      "other_failed": 0
+    },
+    "www.booking.com": {
+      "blocked": 0,
+      "checked": 1,
+      "ok": 1,
+      "other_failed": 0
+    },
+    "www.vrbo.com": {
+      "blocked": 7,
+      "checked": 8,
+      "ok": 0,
+      "other_failed": 1
+    },
+    "www.whimstay.com": {
+      "blocked": 0,
+      "checked": 4,
+      "ok": 0,
+      "other_failed": 4
+    }
+  },
+  "updated": "2026-10-03T15:15:19Z"
 }
