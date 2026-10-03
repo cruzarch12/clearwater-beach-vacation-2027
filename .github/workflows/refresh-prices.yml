@@ -1,0 +1,53 @@
+name: Refresh rental prices
+
+on:
+  schedule:
+    # Every 3 hours. GitHub may delay scheduled runs by a few minutes at
+    # busy times — that's normal, not a failure.
+    #
+    # Going to hourly ("0 * * * *") works mechanically, but weigh it first:
+    # prices on these rentals don't move within an hour in any way that
+    # matters for trip planning, while 24 scrape passes/day (vs. 8 at
+    # 3-hourly) triples how often Airbnb/Vrbo/etc. see repeated automated
+    # visits to the same listings from GitHub's shared runner IPs — which
+    # is exactly what trips their bot detection and starts returning
+    # CAPTCHAs instead of prices. 3-hourly is the steadier choice; switch
+    # the line below to "0 * * * *" if you'd rather have hourly anyway.
+    - cron: "0 */3 * * *"
+  workflow_dispatch: {}   # lets you trigger a run manually from the Actions tab
+
+permissions:
+  contents: write   # needed to commit the refreshed data/prices.json back
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install scraper dependencies
+        run: |
+          pip install -r scripts/requirements.txt
+          playwright install --with-deps chromium
+
+      - name: Re-check every listing and write data/prices.json
+        run: python scripts/scrape_prices.py
+
+      - name: Commit updated prices, if anything changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/prices.json
+          if git diff --cached --quiet; then
+            echo "No price changes — nothing to commit."
+          else
+            git commit -m "Refresh rental prices [automated]"
+            git push
+          fi
