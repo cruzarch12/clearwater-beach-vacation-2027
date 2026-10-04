@@ -1267,8 +1267,20 @@ selectForm.addEventListener('submit', async (ev)=>{
     } else {
       // text/plain avoids a CORS preflight the Apps Script endpoint
       // doesn't need to handle; the script parses JSON from the body.
+      //
+      // mode:"no-cors" is required here: Apps Script Web Apps answer a
+      // POST with a redirect to script.googleusercontent.com, and that
+      // redirected response doesn't carry an Access-Control-Allow-Origin
+      // header. With the default "cors" mode, the browser blocks reading
+      // that response and fetch() throws — even though the script has
+      // already run on Google's side and the row has already been
+      // written to the Sheet. So a "no-cors" request still reaches and
+      // runs the script; we just can't read its response back (the
+      // response here is always "opaque"), which is fine since this is
+      // fire-and-forget — the Sheet itself is the source of truth.
       await fetch(RESPONSES_URL, {
         method: "POST",
+        mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(payload)
       });
