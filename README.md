@@ -62,23 +62,28 @@ obvious which number to double-check. This is a structural limit of those
 sites, not something a script fix can fully solve — the honest fallback is
 always the listing link itself.
 
-### Does "Refresh Pricing" actually trigger a new price check?
+### Does the page update itself, or does someone need to refresh it?
 
-No — and this is worth understanding. Clicking it reloads whatever
-`data/prices.json` the scheduled GitHub Action most recently committed; it
-does **not** kick off a brand-new scrape on demand. That's a deliberate
-choice, not a missing feature: making the button actually fire a new GitHub
-Actions run requires an authenticated request to GitHub's API, and the only
-way to authenticate from inside a public page's JavaScript is to put a
-secret token in the page itself — which anyone opening the link or its page
-source could then read and use. So instead, the button just re-fetches the
-latest committed results (and tells you exactly how fresh they are via the
-"Prices last refreshed" line) while the real checking happens safely on a
-schedule, off to the side, with no exposed credentials. If you ever want a
-true on-demand trigger, the safe way is a small serverless proxy (e.g. a
-free Cloudflare Worker) that holds the token server-side instead — that's
-extra infrastructure to maintain, so it's worth asking for only if the
-3-hour schedule genuinely isn't often enough.
+It updates itself — there's no button to click. The page quietly re-fetches
+`data/prices.json` as soon as it's opened, and then again every 15 minutes
+for as long as that browser tab stays open, so anyone who leaves it up
+all day still catches each of the GitHub Action's 3-hour price checks
+without doing anything. The "Prices last refreshed" line always shows
+exactly how fresh the numbers on screen are.
+
+This does **not** make the page trigger a brand-new scrape on demand — it
+only re-reads whatever `data/prices.json` the scheduled GitHub Action most
+recently committed. That's a deliberate choice, not a missing feature:
+making the page fire a new GitHub Actions run itself would require an
+authenticated request to GitHub's API, and the only way to authenticate
+from inside a public page's JavaScript is to put a secret token in the
+page itself — which anyone opening the link or its page source could then
+read and use. The real checking happens safely on its own schedule, off to
+the side, with no exposed credentials. If you ever want a true on-demand
+trigger, the safe way is a small serverless proxy (e.g. a free Cloudflare
+Worker) that holds the token server-side instead — that's extra
+infrastructure to maintain, so it's worth asking for only if the 3-hour
+schedule genuinely isn't often enough.
 
 ## Collecting everyone's picks
 
