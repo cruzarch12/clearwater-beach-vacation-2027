@@ -75,11 +75,11 @@
       "other_failed": 1
     },
     "www.whimstay.com": {
-      "blocked": 4,
+      "blocked": 0,
       "checked": 4,
       "ok": 0,
-      "other_failed": 0
+      "other_failed": 4
     }
   },
-  "updated": "2026-10-04T18:13:40Z"
+  "updated": "2026-10-04T21:34:51Z"
 }
