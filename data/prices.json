@@ -8,7 +8,7 @@
     "https://sunnyorangestays.com/properties/island-time/?ci=2027-06-07&co=2027-06-12": 10077.3,
     "https://sunnyorangestays.com/properties/summer-breeze/?ci=2027-05-31&co=2027-06-05": 8799.76,
     "https://sunnyorangestays.com/properties/summer-breeze/?ci=2027-06-07&co=2027-06-12": 9937.23,
-    "https://www.airbnb.com/rooms/1126781564607655572?check_in=2027-05-31&check_out=2027-06-05": 12964.0,
+    "https://www.airbnb.com/rooms/1126781564607655572?check_in=2027-05-31&check_out=2027-06-05": 12975.0,
     "https://www.airbnb.com/rooms/1126781564607655572?check_in=2027-06-07&check_out=2027-06-12": 13312.0,
     "https://www.airbnb.com/rooms/1131137832485760959?check_in=2027-05-31&check_out=2027-06-05": 12975.0,
     "https://www.airbnb.com/rooms/1131137832485760959?check_in=2027-06-07&check_out=2027-06-12": 13312.0,
@@ -59,8 +59,8 @@
     "www.airbnb.com": {
       "blocked": 0,
       "checked": 15,
-      "ok": 13,
-      "other_failed": 2
+      "ok": 15,
+      "other_failed": 0
     },
     "www.booking.com": {
       "blocked": 0,
@@ -81,5 +81,5 @@
       "other_failed": 0
     }
   },
-  "updated": "2026-10-04T14:32:12Z"
+  "updated": "2026-10-04T18:13:40Z"
 }
