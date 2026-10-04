@@ -398,10 +398,24 @@
   .leaflet-popup-content-wrapper{
     border-radius:12px;
   }
+  /* Leaflet's own stylesheet sets `.leaflet-container a { color:#0078A8 }`,
+     which is MORE specific than our plain `.row-link` rule (two classes
+     beats one class+tag regardless of source order), so the "View" link
+     was silently losing its white text only inside map popups. These
+     popup-scoped overrides out-specify Leaflet's rule directly. */
+  .popup-inner .row-link{ color:#fff; }
+  .popup-inner .row-panel-btn{ color:var(--teal-deep); }
+  .popup-inner .btn-select{ color:#fff; }
+  .popup-inner{ width:360px; max-width:calc(80vw); }
   .popup-inner h3{ font-size:1rem; margin-bottom:.2rem; }
   .popup-inner .addr{ color:var(--ink-soft); font-size:.8rem; margin-bottom:.4rem; }
-  .popup-inner .prices{ margin-bottom:.5rem; }
+  .popup-inner .prices{ margin-bottom:.3rem; }
   .popup-inner .price-row{ font-size:.82rem; }
+  /* Keep "May 31 – Jun 5" from wrapping mid-range at the popup's narrower
+     width — the card has room for this to wrap, the popup doesn't. */
+  .popup-inner .date-price-line{ flex-wrap:nowrap; }
+  .popup-inner .price-row{ flex-wrap:wrap; }
+  .popup-inner .price-row-actions{ margin-top:.3rem; width:100%; justify-content:flex-start; }
 
   /* ---------- Side drawer ---------- */
   .drawer-overlay{
@@ -809,10 +823,20 @@ if (!mapAvailable) {
   document.getElementById('mapErrorMsg').style.display = 'block';
 } else {
   map = L.map('map', { scrollWheelZoom:false }).setView([27.996,-82.828], 15);
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+
+  const streetLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
     maxZoom:19,
     attribution:'Tiles &copy; Esri &mdash; Source: Esri, HERE, Garmin, OpenStreetMap contributors'
-  }).addTo(map);
+  });
+  const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom:19,
+    attribution:'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'
+  });
+  // Street map on by default; the control lets anyone flip to satellite to
+  // actually see the property and its surroundings (beach distance, pool,
+  // parking, nearby buildings) rather than just road labels.
+  streetLayer.addTo(map);
+  L.control.layers({ "Map": streetLayer, "Satellite": satelliteLayer }, null, { position:'topright' }).addTo(map);
 }
 
 function pinIcon(num, dimmed){
@@ -1033,7 +1057,9 @@ function buildMarkers(){
   if(!mapAvailable) return;
   properties.forEach(p=>{
     const marker = L.marker([p.lat,p.lng], { icon: pinIcon(p.idx,false) }).addTo(map);
-    marker.bindPopup(popupHtml(p));
+    // minWidth/maxWidth widened from Leaflet's ~300px default so the same
+    // price-row layout used in the list cards doesn't wrap awkwardly here.
+    marker.bindPopup(popupHtml(p), { minWidth: 320, maxWidth: 380 });
     marker.on('click', ()=> highlightCard(p.idx));
     markers[p.idx] = marker;
   });
@@ -1068,12 +1094,14 @@ function recommendedBadgeHtml(p){
   return '';
 }
 
+// The popup is a quick-glance preview, not a second copy of the full card —
+// address and specs share one line here (the card keeps them on two) purely
+// to save vertical space in the smaller popup box.
 function popupHtml(p){
   return `<div class="popup-inner">
     <h3>${p.name}</h3>
     ${recommendedBadgeHtml(p)}
-    <div class="addr">${p.addr}</div>
-    <div class="addr">${specsText(p)}</div>
+    <div class="addr">${p.addr} &middot; ${specsText(p)}</div>
     ${pairsWithNoteHtml(p)}
     <div class="prices">${priceRowsHtml(p, true)}</div>
   </div>`;
