@@ -2,15 +2,15 @@
   "offers": {
     "https://clearwaterbeachrentals.guestybookings.com/en/properties/66c4e027e65c370013ea0b7d?checkIn=2027-05-31&checkOut=2027-06-05&adults=15": 11157.62,
     "https://clearwaterbeachrentals.guestybookings.com/en/properties/66c4e027e65c370013ea0b7d?checkIn=2027-06-07&checkOut=2027-06-12&adults=15": 11859.35,
-    "https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-05-31&co=2027-06-05": 7047.0,
-    "https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-06-07&co=2027-06-12": 7806.53,
-    "https://sunnyorangestays.com/properties/island-time/?ci=2027-05-31&co=2027-06-05": 9531.11,
-    "https://sunnyorangestays.com/properties/island-time/?ci=2027-06-07&co=2027-06-12": 10189.44,
+    "https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-05-31&co=2027-06-05": 6953.11,
+    "https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-06-07&co=2027-06-12": 7840.66,
+    "https://sunnyorangestays.com/properties/island-time/?ci=2027-05-31&co=2027-06-05": 9526.23,
+    "https://sunnyorangestays.com/properties/island-time/?ci=2027-06-07&co=2027-06-12": 10077.3,
     "https://sunnyorangestays.com/properties/summer-breeze/?ci=2027-05-31&co=2027-06-05": 8799.76,
     "https://sunnyorangestays.com/properties/summer-breeze/?ci=2027-06-07&co=2027-06-12": 9937.23,
     "https://www.airbnb.com/rooms/1126781564607655572?check_in=2027-05-31&check_out=2027-06-05": 12964.0,
     "https://www.airbnb.com/rooms/1126781564607655572?check_in=2027-06-07&check_out=2027-06-12": 13312.0,
-    "https://www.airbnb.com/rooms/1131137832485760959?check_in=2027-05-31&check_out=2027-06-05": 12964.0,
+    "https://www.airbnb.com/rooms/1131137832485760959?check_in=2027-05-31&check_out=2027-06-05": 12975.0,
     "https://www.airbnb.com/rooms/1131137832485760959?check_in=2027-06-07&check_out=2027-06-12": 13312.0,
     "https://www.airbnb.com/rooms/1508125906855926055?check_in=2027-05-31&check_out=2027-06-05": 5528.0,
     "https://www.airbnb.com/rooms/1616961551420532760?adults=8&check_in=2027-05-31&check_out=2027-06-05&search_mode=regular_search&amenities%5B0%5D=58&amenities%5B1%5D=33&amenities%5B2%5D=34&amenities%5B3%5D=9&amenities%5B4%5D=5&amenities%5B5%5D=4&amenities%5B6%5D=8&amenities%5B7%5D=7&photo_id=2814119387&source_impression_id=p3_1791056306_P3TpMwMXBgBZipMt&previous_page_section_name=1001&federated_search_id=29367616-ec9f-4765-93b2-b2febfb49e42&guests=1": 4225.0,
@@ -53,14 +53,14 @@
     "sunnyorangestays.com": {
       "blocked": 0,
       "checked": 6,
-      "ok": 2,
-      "other_failed": 4
+      "ok": 6,
+      "other_failed": 0
     },
     "www.airbnb.com": {
       "blocked": 0,
       "checked": 15,
-      "ok": 15,
-      "other_failed": 0
+      "ok": 13,
+      "other_failed": 2
     },
     "www.booking.com": {
       "blocked": 0,
@@ -75,11 +75,11 @@
       "other_failed": 1
     },
     "www.whimstay.com": {
-      "blocked": 0,
+      "blocked": 4,
       "checked": 4,
       "ok": 0,
-      "other_failed": 4
+      "other_failed": 0
     }
   },
-  "updated": "2026-10-04T11:20:31Z"
+  "updated": "2026-10-04T14:32:12Z"
 }
