@@ -31,11 +31,42 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          # Caches the pip download cache (keyed to requirements.txt) so an
+          # unchanged requirements.txt skips re-downloading the same wheels
+          # every run — pip still "installs" them into the fresh runner's
+          # site-packages each time (that part can't be skipped, GitHub
+          # Actions VMs are wiped between runs), but it's pulling from the
+          # local cache instead of PyPI, which is the slow part.
+          cache: "pip"
 
-      - name: Install scraper dependencies
-        run: |
-          pip install -r scripts/requirements.txt
-          playwright install --with-deps chromium
+      - name: Install Python dependencies
+        run: pip install -r scripts/requirements.txt
+
+      # The Chromium *browser binary* (~150MB) is the one genuinely slow,
+      # skippable part of setup — it doesn't change unless scripts/
+      # requirements.txt (which pins the playwright version) changes, so
+      # it's cached by that same key. The apt-get system libraries pulled
+      # in by --with-deps CAN'T be cached this way (GitHub Actions doesn't
+      # persist installed system packages between runs, only files under
+      # specific cached paths), so that part still runs every time — but
+      # apt itself already skips anything already present on the stock
+      # ubuntu-latest image, which is most of it. That's why the log shows
+      # a lot of "already the newest version" lines: that's apt being
+      # efficient, not the workflow doing redundant work.
+      - name: Cache Playwright browser binary
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('scripts/requirements.txt') }}
+
+      - name: Install Playwright's Chromium (skips the download on a cache hit)
+        run: playwright install --with-deps chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+      - name: Install just the system libraries Chromium needs (cache hit — binary already present)
+        run: playwright install-deps chromium
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
 
       - name: Re-check every listing and write data/prices.json
         run: python scripts/scrape_prices.py
