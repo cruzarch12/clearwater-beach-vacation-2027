@@ -56,11 +56,22 @@ just this one. In practice:
   that platform as blocked for that run.
 
 When a specific row was affected by this on the most recent refresh, that
-row itself (not a banner at the top) shows **"*** Price not current, open
-to view live price"** in red next to the platform name, so it's always
-obvious which number to double-check. This is a structural limit of those
+row itself (not a banner at the top) shows **"*** Click 'View' for live
+price"** in red next to the platform name, so it's always obvious which
+number to double-check. This is a structural limit of those
 sites, not something a script fix can fully solve — the honest fallback is
 always the listing link itself.
+
+To cut down on how often that happens, `scripts/scrape_prices.py` runs
+every page through [`playwright-stealth`](https://pypi.org/project/playwright-stealth/),
+a free library that hides the usual tells of an automated browser
+(`navigator.webdriver`, headless-only JavaScript properties, the
+headless user-agent string, and a handful of others these sites check
+for). It's not a guarantee against something as defended as Vrbo's
+Akamai protection — nothing free is — but it's a real improvement over
+an untouched headless browser, which is what most of these sites flag
+almost immediately. No setup needed; it's already wired into the
+scheduled check.
 
 ### Does the page update itself, or does someone need to refresh it?
 
