@@ -394,6 +394,47 @@
   }
   .btn-secondary:hover{ border-color:var(--seafoam); }
 
+  /* ---------- Map controls ---------- */
+  .map-toggle-control{
+    background:#fff;
+    border-radius:10px;
+    box-shadow:0 1px 5px rgba(0,0,0,0.4);
+    padding:.5rem .7rem;
+    display:flex;
+    align-items:center;
+    gap:.55rem;
+    font-family:inherit;
+  }
+  .map-toggle-label{
+    font-size:.8rem;
+    font-weight:700;
+    color:var(--teal-deep);
+    white-space:nowrap;
+  }
+  .map-toggle-switch{
+    position:relative;
+    width:44px;
+    height:24px;
+    border-radius:999px;
+    background:#C7CCCB;
+    border:none;
+    cursor:pointer;
+    padding:0;
+    flex:0 0 auto;
+    transition:background .15s ease;
+  }
+  .map-toggle-switch.on{ background:#1F7A4D; }
+  .map-toggle-knob{
+    position:absolute;
+    top:2px; left:2px;
+    width:20px; height:20px;
+    border-radius:50%;
+    background:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,0.3);
+    transition:left .15s ease;
+  }
+  .map-toggle-switch.on .map-toggle-knob{ left:22px; }
+
   /* ---------- Popup ---------- */
   .leaflet-popup-content-wrapper{
     border-radius:12px;
@@ -822,21 +863,59 @@ if (!mapAvailable) {
   document.getElementById('map').style.display = 'none';
   document.getElementById('mapErrorMsg').style.display = 'block';
 } else {
-  map = L.map('map', { scrollWheelZoom:false }).setView([27.996,-82.828], 15);
+  // maxZoom raised to 21 (Esri's own tiles only go to 19 — maxNativeZoom
+  // marks that, and Leaflet smoothly upscales the zoom levels past it)
+  // so anyone can zoom in close enough to make out the house itself and
+  // its immediate surroundings, not just stop at block-level detail.
+  map = L.map('map', { scrollWheelZoom:false, maxZoom:21 }).setView([27.996,-82.828], 16);
 
   const streetLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom:19,
+    maxZoom:21,
+    maxNativeZoom:19,
     attribution:'Tiles &copy; Esri &mdash; Source: Esri, HERE, Garmin, OpenStreetMap contributors'
   });
   const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom:19,
+    maxZoom:21,
+    maxNativeZoom:19,
     attribution:'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'
   });
-  // Street map on by default; the control lets anyone flip to satellite to
-  // actually see the property and its surroundings (beach distance, pool,
-  // parking, nearby buildings) rather than just road labels.
+  // Street map on by default.
   streetLayer.addTo(map);
-  L.control.layers({ "Map": streetLayer, "Satellite": satelliteLayer }, null, { position:'topright' }).addTo(map);
+
+  // A single labeled on/off switch (not Leaflet's default two-option layer
+  // picker) — "Satellite View" with one toggle that's visibly ON (green,
+  // knob right) when satellite imagery is showing and OFF (gray, knob
+  // left) when the street map is showing.
+  const satelliteToggleControl = L.control({ position:'topright' });
+  satelliteToggleControl.onAdd = function(){
+    const div = L.DomUtil.create('div', 'map-toggle-control');
+    div.innerHTML = `
+      <span class="map-toggle-label">Satellite View</span>
+      <button type="button" class="map-toggle-switch" id="satToggleBtn" role="switch" aria-checked="false" aria-label="Toggle satellite view">
+        <span class="map-toggle-knob"></span>
+      </button>`;
+    // Without these, a click/scroll on the control would also drag or
+    // zoom the map underneath it.
+    L.DomEvent.disableClickPropagation(div);
+    L.DomEvent.disableScrollPropagation(div);
+    return div;
+  };
+  satelliteToggleControl.addTo(map);
+
+  const satToggleBtn = document.getElementById('satToggleBtn');
+  let satelliteOn = false;
+  satToggleBtn.addEventListener('click', ()=>{
+    satelliteOn = !satelliteOn;
+    satToggleBtn.classList.toggle('on', satelliteOn);
+    satToggleBtn.setAttribute('aria-checked', String(satelliteOn));
+    if(satelliteOn){
+      map.removeLayer(streetLayer);
+      map.addLayer(satelliteLayer);
+    } else {
+      map.removeLayer(satelliteLayer);
+      map.addLayer(streetLayer);
+    }
+  });
 }
 
 function pinIcon(num, dimmed){
