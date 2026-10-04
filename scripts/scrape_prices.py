@@ -26,6 +26,14 @@ visible text with a small, source-specific regex. That means:
     each run so the page can be honest about it instead of silently
     pretending everything refreshed.
 
+    To cut down on how often that happens, every browser context gets
+    playwright-stealth's evasions applied (hides the usual automation
+    fingerprints — navigator.webdriver, headless-only JS properties, the
+    headless user-agent string, etc.) before any page loads. It's not a
+    guarantee against a site as defended as Vrbo's, but it's a real,
+    free improvement over an untouched headless Chromium, which is what
+    most of these sites flag almost immediately.
+
 Run manually:  python scripts/scrape_prices.py
 """
 
@@ -37,6 +45,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from playwright.async_api import async_playwright
+from playwright_stealth import Stealth
 
 ROOT = Path(__file__).resolve().parent.parent
 PROPERTIES_HTML = ROOT / "index.html"
@@ -230,6 +239,12 @@ async def main():
             viewport={"width": 1366, "height": 900},
             locale="en-US",
         )
+        # Patch over the usual automated-browser tells (navigator.webdriver,
+        # headless-specific JS properties, the headless UA string, etc.)
+        # before any page in this context loads anything. Every page.goto()
+        # a listing site does happens inside this context, so one call here
+        # covers the whole run.
+        await Stealth().apply_stealth_async(context)
         # Small concurrency cap — hammering these sites in parallel is what
         # gets an IP flagged fastest.
         sem = asyncio.Semaphore(3)
