@@ -276,7 +276,7 @@
     flex-direction:row;
     align-items:center;
     justify-content:space-between;
-    flex-wrap:wrap;
+    flex-wrap:nowrap;
     gap:.5rem;
     font-size:.87rem;
     padding:.45rem .5rem;
@@ -285,6 +285,13 @@
   }
   .price-row.match{
     background:#EAF4EE;
+  }
+  /* Only let the price row stack onto two lines on genuinely narrow
+     (phone-width) screens — on any normal desktop/laptop browser the
+     action buttons must always stay on the right, on the same line as
+     the date range and price. */
+  @media (max-width:480px){
+    .price-row{ flex-wrap:wrap; }
   }
   .price-row-info{
     display:flex;
@@ -887,9 +894,14 @@ function computeRecommendations(){
       r1: cheapest(p.offers.r1),
       r2: cheapest(p.offers.r2)
     };
-    // A single property can only ever be recommended alone if its OWN booking
-    // policy (not our bedroom math) allows a group this size.
-    p.recommended = (p.sleeps != null) && (p.sleeps >= GROUP_SIZE_MIN);
+    // A single property is a "best fit" if EITHER path clears the group:
+    // the host's own stated max occupancy already covers 18+ guests, OR
+    // the property simply has enough private bedrooms (8+) to give every
+    // couple their own room under our bedroom math — a listed "sleeps"
+    // number is often a floor, not a hard ceiling, so bedroom count alone
+    // is enough to count a listing in.
+    p.recommended = ((p.sleeps != null) && (p.sleeps >= GROUP_SIZE_MIN))
+      || ((p.beds != null) && (p.beds >= BEDROOMS_NEEDED_MIN));
   });
 
   // Find every same-street pair, score the ones that could plausibly cover
@@ -975,7 +987,7 @@ function offerRowHtml(key, offer, propName, inPopup){
         <span class="date-label">${RANGE_LABELS[key]}</span>
         <span class="amt">${fmt(offer.price)}</span>
       </span>
-      <span class="platform-tag">via ${offer.platform}${stale ? ' <span class="stale-note">*** Price not current, open to view live price</span>' : ''}</span>
+      <span class="platform-tag">via ${offer.platform}${stale ? ' <span class="stale-note">*** Click \'View\' for live price</span>' : ''}</span>
     </div>
     <div class="price-row-actions">
       <a class="row-link" href="${offer.url}" target="_blank" rel="noopener">View</a>
@@ -1058,7 +1070,17 @@ function popupHtml(p){
 function renderList(){
   const col = document.getElementById('listCol');
   col.innerHTML = "";
-  const sorted = [...properties].sort((a,b)=> a.idx - b.idx);
+  // Largest listings first — bedrooms is the primary sort (it's what
+  // actually determines whether the group fits comfortably), sleeps count
+  // breaks ties, so the biggest, most group-friendly options are always
+  // at the top instead of being buried in whatever order they were added.
+  const sorted = [...properties].sort((a,b)=>{
+    if(b.beds !== a.beds) return b.beds - a.beds;
+    const sleepsA = a.sleeps != null ? a.sleeps : 0;
+    const sleepsB = b.sleeps != null ? b.sleeps : 0;
+    if(sleepsB !== sleepsA) return sleepsB - sleepsA;
+    return a.idx - b.idx;
+  });
   sorted.forEach(p=>{
     const show = matchesFilter(p);
     const card = document.createElement('div');
