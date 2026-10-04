@@ -1,85 +1,82 @@
 {
   "offers": {
-    "https://clearwaterbeachrentals.guestybookings.com/en/properties/66c4e027e65c370013ea0b7d?checkIn=2027-05-31&checkOut=2027-06-05&adults=15": 11157.62,
-    "https://clearwaterbeachrentals.guestybookings.com/en/properties/66c4e027e65c370013ea0b7d?checkIn=2027-06-07&checkOut=2027-06-12&adults=15": 11859.35,
     "https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-05-31&co=2027-06-05": 6953.11,
     "https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-06-07&co=2027-06-12": 7840.66,
     "https://sunnyorangestays.com/properties/island-time/?ci=2027-05-31&co=2027-06-05": 9526.23,
     "https://sunnyorangestays.com/properties/island-time/?ci=2027-06-07&co=2027-06-12": 10077.3,
     "https://sunnyorangestays.com/properties/summer-breeze/?ci=2027-05-31&co=2027-06-05": 8799.76,
     "https://sunnyorangestays.com/properties/summer-breeze/?ci=2027-06-07&co=2027-06-12": 9937.23,
-    "https://www.airbnb.com/rooms/1126781564607655572?check_in=2027-05-31&check_out=2027-06-05": 12975.0,
-    "https://www.airbnb.com/rooms/1126781564607655572?check_in=2027-06-07&check_out=2027-06-12": 13312.0,
-    "https://www.airbnb.com/rooms/1131137832485760959?check_in=2027-05-31&check_out=2027-06-05": 12975.0,
-    "https://www.airbnb.com/rooms/1131137832485760959?check_in=2027-06-07&check_out=2027-06-12": 13312.0,
+    "https://www.airbnb.com/rooms/1005043652152471558?adults=8&check_in=2027-05-31&check_out=2027-06-05&guests=6&search_mode=regular_search&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=8&amenities%5B%5D=4&amenities%5B%5D=33&amenities%5B%5D=34&amenities%5B%5D=58&photo_id=1762819634&source_impression_id=p3_1791151807_P3IH1jWqutQjd73B&previous_page_section_name=1001&federated_search_id=eac38a16-67bf-4228-9c15-5f42a9d9928c": 6503.0,
+    "https://www.airbnb.com/rooms/1126781564607655572?adults=8&check_in=2027-05-31&check_out=2027-06-05&guests=6&search_mode=regular_search&amenities%5B%5D=7&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=34&amenities%5B%5D=33&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=2189793986&source_impression_id=p3_1791146162_P3_b2qG3LJXVqeZP&previous_page_section_name=1001&federated_search_id=df4ce87b-79f6-452e-bf33-fb0b8188fd31": 12975.0,
+    "https://www.airbnb.com/rooms/1126781564607655572?adults=8&check_in=2027-06-07&check_out=2027-06-12&guests=6&search_mode=regular_search&amenities%5B%5D=7&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=34&amenities%5B%5D=33&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=2189793986&source_impression_id=p3_1791146248_P3kMNLBr96PLv7Ea&previous_page_section_name=1001&federated_search_id=cad76316-5ad8-402a-bce2-bba466d0416e": 13312.0,
+    "https://www.airbnb.com/rooms/1131137832485760959?adults=8&check_in=2027-05-31&check_out=2027-06-05&guests=6&search_mode=regular_search&amenities%5B%5D=7&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=34&amenities%5B%5D=33&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=1879873769&source_impression_id=p3_1791146170_P3tS0eRHk2st-j2e&previous_page_section_name=1001&federated_search_id=e57d2909-f8f8-4cd0-8914-5fc42c16347c": 12975.0,
+    "https://www.airbnb.com/rooms/1131137832485760959?adults=8&check_in=2027-06-07&check_out=2027-06-12&guests=6&search_mode=regular_search&amenities%5B%5D=7&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=34&amenities%5B%5D=33&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=1879873769&source_impression_id=p3_1791146258_P3W7t64CqcCfQYEl&previous_page_section_name=1001&federated_search_id=cad76316-5ad8-402a-bce2-bba466d0416e": 13312.0,
     "https://www.airbnb.com/rooms/1508125906855926055?check_in=2027-05-31&check_out=2027-06-05": 5528.0,
     "https://www.airbnb.com/rooms/1616961551420532760?adults=8&check_in=2027-05-31&check_out=2027-06-05&search_mode=regular_search&amenities%5B0%5D=58&amenities%5B1%5D=33&amenities%5B2%5D=34&amenities%5B3%5D=9&amenities%5B4%5D=5&amenities%5B5%5D=4&amenities%5B6%5D=8&amenities%5B7%5D=7&photo_id=2814119387&source_impression_id=p3_1791056306_P3TpMwMXBgBZipMt&previous_page_section_name=1001&federated_search_id=29367616-ec9f-4765-93b2-b2febfb49e42&guests=1": 4225.0,
     "https://www.airbnb.com/rooms/1616961551420532760?adults=8&check_in=2027-06-07&check_out=2027-06-12&search_mode=regular_search&amenities%5B%5D=58&amenities%5B%5D=33&amenities%5B%5D=34&amenities%5B%5D=9&amenities%5B%5D=5&amenities%5B%5D=4&amenities%5B%5D=8&amenities%5B%5D=7&photo_id=2814119387&source_impression_id=p3_1791056306_P3TpMwMXBgBZipMt&previous_page_section_name=1001&federated_search_id=29367616-ec9f-4765-93b2-b2febfb49e42": 4295.0,
     "https://www.airbnb.com/rooms/16283747?check_in=2027-05-31&check_out=2027-06-05": 6050.0,
     "https://www.airbnb.com/rooms/16474734?check_in=2027-05-31&check_out=2027-06-05": 8768.0,
     "https://www.airbnb.com/rooms/17822693?check_in=2027-05-31&check_out=2027-06-05": 4014.0,
+    "https://www.airbnb.com/rooms/20743029?adults=6&check_in=2027-05-31&check_out=2027-06-05&guests=6&search_mode=regular_search&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=367039524&source_impression_id=p3_1791149000_P39eAk5TAGwbXILP&previous_page_section_name=1001&federated_search_id=41c1477c-f4a9-410c-b25b-6c98d27eff7e": 4749.0,
+    "https://www.airbnb.com/rooms/20743029?adults=6&check_in=2027-06-07&check_out=2027-06-12&guests=6&search_mode=regular_search&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=367039524&source_impression_id=p3_1791149168_P3bQuF1MjT8L9hxA&previous_page_section_name=1001&federated_search_id=13bc342b-5523-4cf5-b395-0b6f2380b7cd": 4749.0,
     "https://www.airbnb.com/rooms/20813370?adults=8&check_in=2027-06-07&check_out=2027-06-12&search_mode=regular_search&amenities%5B%5D=58&amenities%5B%5D=33&amenities%5B%5D=34&amenities%5B%5D=9&amenities%5B%5D=5&amenities%5B%5D=4&amenities%5B%5D=8&amenities%5B%5D=7&photo_id=369091920&source_impression_id=p3_1791056338_P3wsKyYYtCZhEfOr&previous_page_section_name=1001&federated_search_id=54377898-c351-49bc-b4b0-323cc23e1fca": 6376.0,
     "https://www.airbnb.com/rooms/49227396?check_in=2027-05-31&check_out=2027-06-05": 9613.0,
     "https://www.airbnb.com/rooms/49227396?check_in=2027-06-07&check_out=2027-06-12": 11189.0,
-    "https://www.airbnb.com/rooms/52600497?check_in=2027-05-31&check_out=2027-06-05": 4735.0,
-    "https://www.airbnb.com/rooms/52600497?check_in=2027-06-07&check_out=2027-06-12": 4897.0,
-    "https://www.booking.com/hotel/us/vista-del-mar-villa-by-goldencoastrentals.en-us.html?checkin=2027-05-31&checkout=2027-06-05&group_adults=15": 11576.0,
-    "https://www.vrbo.com/1036056?chkin=2027-05-31&chkout=2027-06-05": 4076,
-    "https://www.vrbo.com/2284892?chkin=2027-05-31&chkout=2027-06-05": 9842,
-    "https://www.vrbo.com/2284892?chkin=2027-06-07&chkout=2027-06-12": 11063,
-    "https://www.vrbo.com/2564331?chkin=2027-05-31&chkout=2027-06-05": 4637,
-    "https://www.vrbo.com/2564331?chkin=2027-06-07&chkout=2027-06-12": 5070,
-    "https://www.vrbo.com/3247385ha?chkin=2027-05-31&chkout=2027-06-05": 11028,
-    "https://www.vrbo.com/4349678ha?chkin=2027-05-31&chkout=2027-06-05": 10312,
-    "https://www.vrbo.com/4349678ha?chkin=2027-06-07&chkout=2027-06-12": 11876,
-    "https://www.whimstay.com/detail/Island-Time-Huge-Pool-Home-Sleeps-18-Cabana-Bar-Steps-to-Beach-22-Laurel/dbe4be71a173998f90b416de48b18adf?check_in=2027-05-31&check_out=2027-06-05": 10064,
-    "https://www.whimstay.com/detail/Island-Time-Huge-Pool-Home-Sleeps-18-Cabana-Bar-Steps-to-Beach-22-Laurel/dbe4be71a173998f90b416de48b18adf?check_in=2027-06-07&check_out=2027-06-12": 10776,
-    "https://www.whimstay.com/detail/Summer-Breeze-Beachside-Pool-Home-Tiki-Bar-Sleeps-20-770-Mandalay/1761826f997f8890245f515bad34aed8?check_in=2027-05-31&check_out=2027-06-05": 9384,
-    "https://www.whimstay.com/detail/Summer-Breeze-Beachside-Pool-Home-Tiki-Bar-Sleeps-20-770-Mandalay/1761826f997f8890245f515bad34aed8?check_in=2027-06-07&check_out=2027-06-12": 10816
+    "https://www.airbnb.com/rooms/52600497?adults=8&check_in=2027-05-31&check_out=2027-06-05&guests=6&search_mode=regular_search&amenities%5B%5D=7&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=34&amenities%5B%5D=33&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=1811854569&source_impression_id=p3_1791146713_P3nq4q3Es8e8wfRC&previous_page_section_name=1001&federated_search_id=5312b0c6-4312-4e81-b984-76e8a64dc1a0": 4735.0,
+    "https://www.airbnb.com/rooms/52600497?adults=8&check_in=2027-06-07&check_out=2027-06-12&guests=6&search_mode=regular_search&amenities%5B%5D=7&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=34&amenities%5B%5D=33&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=1811854569&source_impression_id=p3_1791146587_P3M90CuHyOOqqSeW&previous_page_section_name=1001&federated_search_id=dd43953a-b874-4b25-855e-7aa2b3f32204": 4897.0,
+    "https://www.booking.com/hotel/us/vista-del-mar-villa-by-goldencoastrentals.html?aid=304142&label=mkt123sc-ef2a859e-7795-4df9-bf75-7aca6c5e9f06&ucfs=1&checkin=2027-06-07&checkout=2027-06-12&dest_id=20021863&dest_type=city&group_adults=16&no_rooms=6&group_children=0&srpvid=46f692e6faa3029c&srepoch=1791147242&all_sr_blocks=1556361801_426769148_21_0_0&highlighted_blocks=1556361801_426769148_21_0_0&matching_block_id=1556361801_426769148_21_0_0&atlas_src=sr_iw_title": 12290.0,
+    "https://www.booking.com/hotel/us/vista-del-mar-villa-by-goldencoastrentals.html?label=mkt123sc-50f8ad5f-514f-4fab-b839-82d99869ae1d&aid=304142&ucfs=1&checkin=2027-05-31&checkout=2027-06-05&dest_id=20021863&dest_type=city&group_adults=16&no_rooms=6&group_children=0&srpvid=734c92835b910092&srepoch=1791147164&all_sr_blocks=1556361801_426769148_21_0_0&highlighted_blocks=1556361801_426769148_21_0_0&matching_block_id=1556361801_426769148_21_0_0&atlas_src=sr_iw_title": 11576.0
   },
   "platform_status": {
     "booking.thegemmacwb.com": {
       "blocked": 0,
       "checked": 4,
       "ok": 0,
-      "other_failed": 4
+      "other_failed": 4,
+      "unavailable": 0
     },
     "clearwaterbeachrentals.guestybookings.com": {
       "blocked": 0,
       "checked": 2,
       "ok": 0,
-      "other_failed": 2
+      "other_failed": 2,
+      "unavailable": 0
     },
     "sunnyorangestays.com": {
       "blocked": 0,
       "checked": 6,
       "ok": 6,
-      "other_failed": 0
+      "other_failed": 0,
+      "unavailable": 0
     },
     "www.airbnb.com": {
       "blocked": 0,
-      "checked": 15,
-      "ok": 15,
-      "other_failed": 0
+      "checked": 18,
+      "ok": 18,
+      "other_failed": 0,
+      "unavailable": 0
     },
     "www.booking.com": {
       "blocked": 0,
-      "checked": 1,
-      "ok": 1,
-      "other_failed": 0
+      "checked": 2,
+      "ok": 2,
+      "other_failed": 0,
+      "unavailable": 0
     },
     "www.vrbo.com": {
       "blocked": 10,
       "checked": 11,
       "ok": 0,
-      "other_failed": 1
+      "other_failed": 1,
+      "unavailable": 0
     },
     "www.whimstay.com": {
       "blocked": 0,
       "checked": 4,
       "ok": 0,
-      "other_failed": 4
+      "other_failed": 4,
+      "unavailable": 0
     }
   },
-  "updated": "2026-10-04T21:34:51Z"
+  "updated": "2026-10-04T23:44:02Z"
 }
