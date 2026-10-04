@@ -56,20 +56,6 @@
     font-size:1.02rem;
     max-width:640px;
   }
-  .group-rec{
-    margin:.6rem 0 0;
-    max-width:640px;
-    background:rgba(255,255,255,0.1);
-    border:1px solid rgba(255,255,255,0.25);
-    border-radius:10px;
-    padding:.6rem .8rem;
-    font-size:.88rem;
-    color:#fff;
-    line-height:1.45;
-    display:none;
-  }
-  .group-rec.show{ display:block; }
-  .group-rec strong{ color:#fff; }
   .title-row{
     display:flex;
     flex-wrap:wrap;
@@ -92,18 +78,6 @@
   }
   .btn-refresh:hover{ background:var(--coral-dark); border-color:var(--coral-dark); }
   .btn-refresh:disabled{ opacity:.6; cursor:default; }
-  .refresh-icon{
-    display:inline-block;
-    font-size:1rem;
-    line-height:1;
-  }
-  .refresh-icon.spinning{
-    animation:spin 0.9s linear infinite;
-  }
-  @keyframes spin{
-    from{ transform:rotate(0deg); }
-    to{ transform:rotate(360deg); }
-  }
   .refresh-status{
     margin:.6rem 0 0;
     font-size:.85rem;
@@ -231,6 +205,10 @@
     border:2px solid #1F7A4D;
     box-shadow:0 2px 10px rgba(31,122,77,0.18);
   }
+  .card.recommended-pair{
+    border:2px solid #C56A15;
+    box-shadow:0 2px 10px rgba(197,106,21,0.18);
+  }
   .recommended-badge{
     display:inline-block;
     background:#1F7A4D;
@@ -241,6 +219,7 @@
     border-radius:999px;
     margin-bottom:.5rem;
   }
+  .recommended-badge.recommended-badge-orange{ background:#C56A15; }
   .pairs-note{
     margin-top:.45rem;
     font-size:.78rem;
@@ -250,6 +229,11 @@
     padding:.4rem .55rem;
   }
   .pairs-note strong{ color:var(--teal-deep); }
+  .pairs-note-orange{
+    background:#FDF1E6;
+    color:#8A4A10;
+  }
+  .pairs-note-orange strong{ color:#C56A15; }
   .card-top{
     display:flex;
     justify-content:space-between;
@@ -289,11 +273,13 @@
   }
   .price-row{
     display:flex;
-    justify-content:space-between;
+    flex-direction:row;
     align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
     gap:.5rem;
     font-size:.87rem;
-    padding:.4rem .5rem;
+    padding:.45rem .5rem;
     border-radius:8px;
     background:var(--sand);
   }
@@ -305,10 +291,26 @@
     flex-direction:column;
     gap:.1rem;
     min-width:0;
+    flex:1 1 auto;
+  }
+  .price-row-info .date-price-line{
+    display:flex;
+    align-items:center;
+    gap:.45rem;
+    flex-wrap:wrap;
   }
   .price-row-info .date-label{
     font-weight:600;
     color:var(--ink);
+  }
+  .price-row .amt{
+    font-weight:800;
+    color:#000;
+    white-space:nowrap;
+  }
+  .price-row.na .amt{
+    color:var(--ink-soft);
+    font-weight:500;
   }
   .price-row-info .platform-tag{
     font-size:.76rem;
@@ -321,49 +323,43 @@
   .price-row-actions{
     display:flex;
     align-items:center;
-    gap:.5rem;
+    gap:.45rem;
     flex:0 0 auto;
+    flex-wrap:wrap;
   }
-  .price-row .amt{
+  .row-link, .row-panel-btn, .btn-select{
+    height:2.15rem;
+    box-sizing:border-box;
+    line-height:1;
+    font-size:.82rem;
     font-weight:700;
-    color:var(--teal-deep);
+    border-radius:8px;
+    padding:0 .9rem;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 auto;
+    border:none;
     white-space:nowrap;
-  }
-  .price-row.na .amt{
-    color:var(--ink-soft);
-    font-weight:500;
+    cursor:pointer;
   }
   .row-link{
-    font-size:.8rem;
-    font-weight:600;
-    color:var(--coral-dark);
+    color:#fff;
+    background:var(--teal-mid);
     text-decoration:none;
-    white-space:nowrap;
   }
-  .row-link:hover{ text-decoration:underline; }
-  .row-icon-btn{
+  .row-link:hover{ background:var(--teal-deep); }
+  .row-panel-btn{
     font-family:inherit;
-    font-size:.85rem;
-    line-height:1;
-    background:transparent;
-    border:1.5px solid var(--line);
-    border-radius:6px;
-    color:var(--teal-mid);
-    cursor:pointer;
-    padding:.2rem .4rem;
+    background:var(--seafoam);
+    color:var(--teal-deep);
   }
-  .row-icon-btn:hover{ border-color:var(--seafoam); }
+  .row-panel-btn:hover{ background:#7CB0A8; }
   .btn-select{
     font-family:inherit;
-    font-size:.78rem;
-    font-weight:700;
     background:var(--coral);
     color:#fff;
-    border:none;
-    border-radius:6px;
-    padding:.3rem .6rem;
-    cursor:pointer;
-    white-space:nowrap;
+    letter-spacing:.01em;
   }
   .btn-select:hover{ background:var(--coral-dark); }
   .card-actions{
@@ -570,12 +566,8 @@
   <div class="header-inner">
     <div class="title-row">
       <h1>Clearwater Beach, Summer 2027</h1>
-      <button class="btn btn-refresh" id="refreshBtn" title="Re-check pricing">
-        <span class="refresh-icon" id="refreshIcon">&#8635;</span> Refresh Pricing
-      </button>
     </div>
     <p class="sub">Every rental option we've found so far, mapped and priced for our two candidate weeks. Tap a pin or a card to see the listing.</p>
-    <p class="group-rec" id="groupRec"></p>
     <p class="last-updated" id="lastUpdated"><span class="dot"></span>Checking price freshness…</p>
     <p class="refresh-status" id="refreshStatus" aria-live="polite"></p>
   </div>
@@ -586,6 +578,7 @@
     <button class="chip" data-range="r2">Jun 7 – Jun 12</button>
   </div>
   <p class="filter-note" id="filterNote">Showing all 12 options across both weeks.</p>
+  <p class="filter-note" id="selectHelp">Tapping <strong>My Pick</strong> on a listing records that property + date range as your family's pick — you'll confirm your name and group size right after, and it's saved to our shared list.</p>
 </header>
 
 <div class="layout">
@@ -655,25 +648,25 @@ const RANGE_LABELS = { r1: "May 31 – Jun 5", r2: "Jun 7 – Jun 12" };
 // future price refresh just means editing numbers here — no restructuring.
 const properties = [
   { name:"North Beach Triplex", addr:"963 Mandalay Ave, Clearwater, FL 33767",
-    beds:8, baths:5, amenity:"Pool", sleeps:16, fallback:[28.000500818655063,-82.82609675542467],
+    beds:8, baths:5, amenity:"Pool", sleeps:16, street:"Mandalay Ave", fallback:[28.000500818655063,-82.82609675542467],
     offers:{
       r1:[
         { platform:"Airbnb", price:9691, url:"https://www.airbnb.com/rooms/49227396?check_in=2027-05-31&check_out=2027-06-05" },
-        { platform:"Vrbo", price:9842, url:"https://www.vrbo.com/2284892?chkin=2027-05-31&chkout=2027-06-05" }
+        { platform:"Vrbo", price:9842, url:"https://www.vrbo.com/2284892?chkin=2027-05-31&chkout=2027-06-05&d1=2027-05-31&d2=2027-06-05&startDate=2027-05-31&endDate=2027-06-05&x_pwa=1&rfrr=HSR&pwa_ts=1791059723808&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=10759&destination=Clearwater%20Beach%2C%20Florida%2C%20United%20States%20of%20America&destType=BOUNDING_BOX&latLong=27.977474%2C-82.827931&amenities_facilities_group=private_pool%2Cair_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=0d35c51e-d501-4351-992b-626232172ec3&sort=RECOMMENDED&top_dp=1749&top_cur=USD&userIntent=&selectedRoomType=66895252&selectedRatePlan=0004c14c3f1edfa54af9a38ee7eb1fcc2235&expediaPropertyId=66895252&containsVideo=false" }
       ],
       r2:[
         { platform:"Airbnb", price:11389, url:"https://www.airbnb.com/rooms/49227396?check_in=2027-06-07&check_out=2027-06-12" },
-        { platform:"Vrbo", price:11063, url:"https://www.vrbo.com/2284892?chkin=2027-06-07&chkout=2027-06-12" }
+        { platform:"Vrbo", price:11063, url:"https://www.vrbo.com/2284892?chkin=2027-06-07&chkout=2027-06-12&d1=2027-05-31&d2=2027-06-05&startDate=2027-06-07&endDate=2027-06-12&x_pwa=1&rfrr=HSR&pwa_ts=1791059723808&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=10759&destination=Clearwater+Beach%2C+Florida%2C+United+States+of+America&destType=BOUNDING_BOX&latLong=27.977474%2C-82.827931&amenities_facilities_group=private_pool%2Cair_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=25cfbe7d-4a5e-490c-9080-c153bd06d329&sort=RECOMMENDED&top_dp=1749&top_cur=USD&userIntent=&selectedRoomType=66895252&selectedRatePlan=0004c14c3f1edfa54af9a38ee7eb1fcc2235&expediaPropertyId=66895252&containsVideo=false" }
       ]
     } },
   { name:"Casa Del Mar", addr:"971 Eldorado Ave, Clearwater, FL 33767",
-    beds:6, baths:4, amenity:"Pool", sleeps:12, fallback:[28.000716886230133,-82.82691719992422],
+    beds:6, baths:4, amenity:"Pool", sleeps:12, street:"Eldorado Ave", fallback:[28.000716886230133,-82.82691719992422],
     offers:{
       r1:[{ platform:"Direct", price:7009.20, url:"https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-05-31&co=2027-06-05" }],
       r2:[{ platform:"Direct", price:7808.97, url:"https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-06-07&co=2027-06-12" }]
     } },
   { name:"Island Time", addr:"22 Laurel St, Clearwater, FL 33767",
-    beds:6, baths:4, amenity:"Pool", sleeps:16, fallback:[27.999657846405757,-82.82682132238308],
+    beds:6, baths:4, amenity:"Pool", sleeps:16, street:"Laurel St", fallback:[27.999657846405757,-82.82682132238308],
     offers:{
       r1:[
         { platform:"Airbnb", price:8768, url:"https://www.airbnb.com/rooms/16474734?check_in=2027-05-31&check_out=2027-06-05" },
@@ -687,7 +680,7 @@ const properties = [
       ]
     } },
   { name:"Summer Breeze", addr:"770 Mandalay Ave, Clearwater, FL 33767",
-    beds:7, baths:3, amenity:"Pool", sleeps:20, fallback:[27.992983667588863,-82.8270712577568],
+    beds:7, baths:3, amenity:"Pool", sleeps:20, street:"Mandalay Ave", fallback:[27.992983667588863,-82.8270712577568],
     offers:{
       r1:[
         { platform:"Direct", price:8882.66, url:"https://sunnyorangestays.com/properties/summer-breeze/?ci=2027-05-31&co=2027-06-05" },
@@ -701,25 +694,25 @@ const properties = [
       ]
     } },
   { name:"4-Bed Coastal Retreat", addr:"724 Mandalay Ave, Clearwater, FL 33767",
-    beds:4, baths:2, amenity:"Pool", sleeps:10, fallback:[27.99098552264128,-82.82694752102778],
+    beds:4, baths:2, amenity:"Pool", sleeps:10, street:"Mandalay Ave", fallback:[27.99098552264128,-82.82694752102778],
     offers:{
-      r1:[{ platform:"Vrbo", price:4637, url:"https://www.vrbo.com/2564331?chkin=2027-05-31&chkout=2027-06-05" }],
-      r2:[{ platform:"Vrbo", price:5070, url:"https://www.vrbo.com/2564331?chkin=2027-06-07&chkout=2027-06-12" }]
+      r1:[{ platform:"Vrbo", price:4637, url:"https://www.vrbo.com/2564331?chkin=2027-05-31&chkout=2027-06-05&d1=2027-05-31&d2=2027-06-05&startDate=2027-05-31&endDate=2027-06-05&x_pwa=1&rfrr=HSR&pwa_ts=1791059657035&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=10759&destination=Clearwater%20Beach%2C%20Florida%2C%20United%20States%20of%20America&destType=BOUNDING_BOX&latLong=27.977474%2C-82.827931&amenities_facilities_group=private_pool%2Cair_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=93591ac8-7ab1-4693-ba49-dcc2255cff4a&sort=RECOMMENDED&top_dp=921&top_cur=USD&userIntent=&selectedRoomType=73315199&selectedRatePlan=00048ed09a6d130941e39b3e6a0d51fd1a04&expediaPropertyId=73315199&containsVideo=false" }],
+      r2:[{ platform:"Vrbo", price:5070, url:"https://www.vrbo.com/2564331?chkin=2027-06-07&chkout=2027-06-12&d1=2027-05-31&d2=2027-06-05&startDate=2027-06-07&endDate=2027-06-12&x_pwa=1&rfrr=HSR&pwa_ts=1791059657035&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=10759&destination=Clearwater+Beach%2C+Florida%2C+United+States+of+America&destType=BOUNDING_BOX&latLong=27.977474%2C-82.827931&amenities_facilities_group=private_pool%2Cair_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=90feb2a8-18ac-420e-8300-e42b8d81f68a&sort=RECOMMENDED&top_dp=921&top_cur=USD&userIntent=&selectedRoomType=73315199&selectedRatePlan=00048ed09a6d130941e39b3e6a0d51fd1a04&expediaPropertyId=73315199&containsVideo=false" }]
     } },
   { name:"House & Cottage", addr:"847 Eldorado Ave, Clearwater, FL 33767",
-    beds:4, baths:3, amenity:"Hot tub", sleeps:10, fallback:[27.995585042660206,-82.82752178649177],
+    beds:4, baths:3, amenity:"Hot tub", sleeps:10, street:"Eldorado Ave", fallback:[27.995585042660206,-82.82752178649177],
     offers:{
       r1:[{ platform:"Airbnb", price:4272, url:"https://www.airbnb.com/rooms/52600497?check_in=2027-05-31&check_out=2027-06-05" }],
       r2:[{ platform:"Airbnb", price:4760, url:"https://www.airbnb.com/rooms/52600497?check_in=2027-06-07&check_out=2027-06-12" }]
     } },
   { name:"Gulf Front Dreams Beachfront Home", addr:"864 Eldorado Ave, Clearwater, FL 33767",
-    beds:3, baths:2, amenity:"Small pool", sleeps:10, fallback:[27.996439353573592,-82.82793760351754],
+    beds:3, baths:2, amenity:"Small pool", sleeps:10, street:"Eldorado Ave", fallback:[27.996439353573592,-82.82793760351754],
     offers:{
       r1:[{ platform:"Airbnb", price:6050, url:"https://www.airbnb.com/rooms/16283747?check_in=2027-05-31&check_out=2027-06-05" }],
       r2:[]
     } },
   { name:"Starfish Beach House", addr:"18 Cambria St, Clearwater, FL 33767",
-    beds:3, baths:3, amenity:"Pool", sleeps:12, fallback:[27.988661972498726,-82.82729870027256],
+    beds:3, baths:3, amenity:"Pool", sleeps:12, street:"Cambria St", fallback:[27.988661972498726,-82.82729870027256],
     offers:{
       r1:[
         { platform:"Airbnb", price:4014, url:"https://www.airbnb.com/rooms/17822693?check_in=2027-05-31&check_out=2027-06-05" },
@@ -728,7 +721,7 @@ const properties = [
       r2:[]
     } },
   { name:"Coastal Beach Retreat", addr:"26 Cambria St, Clearwater, FL 33767",
-    beds:5, baths:3, amenity:"Pool", sleeps:14, fallback:[27.98864308387402,-82.82694563693613],
+    beds:5, baths:3, amenity:"Pool", sleeps:14, street:"Cambria St", fallback:[27.98864308387402,-82.82694563693613],
     offers:{
       r1:[{ platform:"Airbnb", price:5528, url:"https://www.airbnb.com/rooms/1508125906855926055?check_in=2027-05-31&check_out=2027-06-05" }],
       r2:[]
@@ -745,16 +738,49 @@ const properties = [
       ]
     } },
   { name:"Akoya House at The Gemma", addr:"19 Somerset St, Clearwater, FL 33767",
-    beds:5, baths:5, amenity:"Pool", sleeps:14, pairsWith:"Pearl House at The Gemma", fallback:[27.988947,-82.827269],
+    beds:6, baths:6.5, amenity:"Pool", sleeps:14, street:"Somerset St", fallback:[27.988947,-82.827269],
     offers:{
-      r1:[{ platform:"Airbnb", price:12972, url:"https://www.airbnb.com/rooms/1126781564607655572?check_in=2027-05-31&check_out=2027-06-05" }],
-      r2:[{ platform:"Airbnb", price:13315, url:"https://www.airbnb.com/rooms/1126781564607655572?check_in=2027-06-07&check_out=2027-06-12" }]
+      r1:[
+        { platform:"Airbnb", price:12972, url:"https://www.airbnb.com/rooms/1126781564607655572?check_in=2027-05-31&check_out=2027-06-05" },
+        { platform:"Direct", price:12828.89, url:"https://booking.thegemmacwb.com/en/properties/6557b587d20bd0005a4b1a2e?minOccupancy=14&checkIn=2027-05-31&checkOut=2027-06-05&adults=14" }
+      ],
+      r2:[
+        { platform:"Airbnb", price:13315, url:"https://www.airbnb.com/rooms/1126781564607655572?check_in=2027-06-07&check_out=2027-06-12" },
+        { platform:"Direct", price:13170.15, url:"https://booking.thegemmacwb.com/en/properties/6557b587d20bd0005a4b1a2e?minOccupancy=14&checkIn=2027-06-07&checkOut=2027-06-12&adults=14" }
+      ]
     } },
   { name:"Pearl House at The Gemma", addr:"21 Somerset St, Clearwater, FL 33767",
-    beds:5, baths:5, amenity:"Pool", sleeps:14, pairsWith:"Akoya House at The Gemma", fallback:[27.988959,-82.827099],
+    beds:6, baths:6.5, amenity:"Pool", sleeps:14, street:"Somerset St", fallback:[27.988959,-82.827099],
     offers:{
-      r1:[{ platform:"Airbnb", price:12972, url:"https://www.airbnb.com/rooms/1131137832485760959?check_in=2027-05-31&check_out=2027-06-05" }],
-      r2:[{ platform:"Airbnb", price:13315, url:"https://www.airbnb.com/rooms/1131137832485760959?check_in=2027-06-07&check_out=2027-06-12" }]
+      r1:[
+        { platform:"Airbnb", price:12972, url:"https://www.airbnb.com/rooms/1131137832485760959?check_in=2027-05-31&check_out=2027-06-05" },
+        { platform:"Direct", price:12828.89, url:"https://booking.thegemmacwb.com/en/properties/6557b6747c64d0003c7e532e?minOccupancy=14&checkIn=2027-05-31&checkOut=2027-06-05&adults=14" }
+      ],
+      r2:[
+        { platform:"Airbnb", price:13315, url:"https://www.airbnb.com/rooms/1131137832485760959?check_in=2027-06-07&check_out=2027-06-12" },
+        { platform:"Direct", price:13170.15, url:"https://booking.thegemmacwb.com/en/properties/6557b6747c64d0003c7e532e?minOccupancy=14&checkIn=2027-06-07&checkOut=2027-06-12&adults=14" }
+      ]
+    } },
+  { name:"Sea Breeze", addr:"1040 Bay Esplanade, Clearwater, FL 33767",
+    beds:5, baths:3.5, amenity:"Pool", sleeps:10, street:"Bay Esplanade", fallback:[28.003496688736213,-82.82575543590514],
+    offers:{
+      r1:[],
+      r2:[
+        { platform:"Airbnb", price:6442, url:"https://www.airbnb.com/rooms/20813370?adults=8&check_in=2027-06-07&check_out=2027-06-12&search_mode=regular_search&amenities%5B%5D=58&amenities%5B%5D=33&amenities%5B%5D=34&amenities%5B%5D=9&amenities%5B%5D=5&amenities%5B%5D=4&amenities%5B%5D=8&amenities%5B%5D=7&photo_id=369091920&source_impression_id=p3_1791056338_P3wsKyYYtCZhEfOr&previous_page_section_name=1001&federated_search_id=54377898-c351-49bc-b4b0-323cc23e1fca" },
+        { platform:"Vrbo", price:6348, url:"https://www.vrbo.com/515046?chkin=2027-06-07&chkout=2027-06-12&d1=2027-06-07&d2=2027-06-12&startDate=2027-06-07&endDate=2027-06-12&x_pwa=1&rfrr=HSR&pwa_ts=1791061484537&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=553248635976481268&destination=Carlouel%2C%20Clearwater%20Beach%2C%20Florida%2C%20United%20States%20of%20America&destType=BOUNDING_BOX&neighborhoodId=553248635976481268&latLong=28.002338%2C-82.825397&amenities_facilities_group=air_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=e14a6a52-ad12-4e4c-a60a-712abbfcc746&sort=RECOMMENDED&top_dp=1117&top_cur=USD&userIntent=&selectedRoomType=18978146&selectedRatePlan=00046a53e47c94644177b42d8db1f15371cb&expediaPropertyId=18978146&containsVideo=false" }
+      ]
+    } },
+  { name:"Walk to Beach House", addr:"976 Mandalay Ave, Clearwater, FL 33767",
+    beds:4, baths:2, amenity:"Pool", sleeps:10, street:"Mandalay Ave", fallback:[28.001262643904788,-82.82632175673426],
+    offers:{
+      r1:[
+        { platform:"Airbnb", price:4221, url:"https://www.airbnb.com/rooms/1616961551420532760?adults=8&check_in=2027-05-31&check_out=2027-06-05&search_mode=regular_search&amenities%5B0%5D=58&amenities%5B1%5D=33&amenities%5B2%5D=34&amenities%5B3%5D=9&amenities%5B4%5D=5&amenities%5B5%5D=4&amenities%5B6%5D=8&amenities%5B7%5D=7&photo_id=2814119387&source_impression_id=p3_1791056306_P3TpMwMXBgBZipMt&previous_page_section_name=1001&federated_search_id=29367616-ec9f-4765-93b2-b2febfb49e42&guests=1" },
+        { platform:"Vrbo", price:4057, url:"https://www.vrbo.com/5092095?chkin=2027-05-31&chkout=2027-06-05&d1=2027-05-31&d2=2027-06-05&startDate=2027-05-31&endDate=2027-06-05&x_pwa=1&rfrr=HSR&pwa_ts=1791059770923&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=553248635976481268&destination=Carlouel%2C%20Clearwater%20Beach%2C%20Florida%2C%20United%20States%20of%20America&destType=BOUNDING_BOX&neighborhoodId=553248635976481268&latLong=28.002338%2C-82.825397&amenities_facilities_group=private_pool%2Cair_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=c84825af-a5e3-46c3-81dd-b0971f371352&sort=RECOMMENDED&top_dp=807&top_cur=USD&userIntent=&selectedRoomType=126000564&selectedRatePlan=0004f30576b3691c49669700d24d60bc1f6f&expediaPropertyId=126000564&containsVideo=false&pwaThumbnailDialog=thumbnail-gallery" }
+      ],
+      r2:[
+        { platform:"Airbnb", price:4314, url:"https://www.airbnb.com/rooms/1616961551420532760?adults=8&check_in=2027-06-07&check_out=2027-06-12&search_mode=regular_search&amenities%5B%5D=58&amenities%5B%5D=33&amenities%5B%5D=34&amenities%5B%5D=9&amenities%5B%5D=5&amenities%5B%5D=4&amenities%5B%5D=8&amenities%5B%5D=7&photo_id=2814119387&source_impression_id=p3_1791056306_P3TpMwMXBgBZipMt&previous_page_section_name=1001&federated_search_id=29367616-ec9f-4765-93b2-b2febfb49e42" },
+        { platform:"Vrbo", price:4146, url:"https://www.vrbo.com/5092095?chkin=2027-06-07&chkout=2027-06-12&d1=2027-05-31&d2=2027-06-05&startDate=2027-06-07&endDate=2027-06-12&x_pwa=1&rfrr=HSR&pwa_ts=1791059770923&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=553248635976481268&destination=Carlouel%2C+Clearwater+Beach%2C+Florida%2C+United+States+of+America&destType=BOUNDING_BOX&neighborhoodId=553248635976481268&latLong=28.002338%2C-82.825397&amenities_facilities_group=private_pool%2Cair_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=820b00b5-3273-448e-b890-ac6af3fce0be&sort=RECOMMENDED&top_dp=807&top_cur=USD&userIntent=&selectedRoomType=126000564&selectedRatePlan=0004f30576b3691c49669700d24d60bc1f6f&expediaPropertyId=126000564&containsVideo=false" }
+      ]
     } }
 ];
 
@@ -807,61 +833,124 @@ function pinIcon(num, dimmed){
   });
 }
 
-// The whole group is 18–20 people, so any single property that sleeps at
-// least this many is flagged as the recommended, no-splitting-up option.
+// ---- Group-fit recommendation engine ----
+// Everything here is computed from the data below, not hand-written, so it
+// stays correct if prices, sleeps counts, or the property list change.
+
+// The whole group is 18–20 people. Of the children, 2 share a parent's
+// bedroom (no extra room needed) and 2 share a bedroom of their own; every
+// other guest is assumed to be part of a couple sharing one bedroom. That's
+// what "sleeps 18" should mean in real bedrooms, not sofa beds.
 const GROUP_SIZE_MIN = 18;
+const GROUP_SIZE_MAX = 20;
+const TOTAL_CHILDREN = 4;
+const CHILDREN_IN_OWN_ROOM = 2; // the other 2 children share a parent's room
 
-// Computed once at load, not on every render: the cheapest offer per date
-// range for each property. Filtering/re-rendering just reads these instead
-// of re-scanning every offer array each time.
-properties.forEach((p,i) => {
-  p.idx = i+1;
-  p.lat = p.fallback[0];
-  p.lng = p.fallback[1];
-  p.best = {
-    r1: cheapest(p.offers.r1),
-    r2: cheapest(p.offers.r2)
-  };
-  p.recommended = (p.sleeps != null) && (p.sleeps >= GROUP_SIZE_MIN);
-});
+function bedroomsNeededFor(totalGuests){
+  const adults = totalGuests - TOTAL_CHILDREN;
+  const coupleRooms = Math.ceil(adults / 2);
+  return coupleRooms + (CHILDREN_IN_OWN_ROOM > 0 ? 1 : 0);
+}
+const BEDROOMS_NEEDED_MIN = bedroomsNeededFor(GROUP_SIZE_MIN); // 8
+const BEDROOMS_NEEDED_MAX = bedroomsNeededFor(GROUP_SIZE_MAX); // 9
 
-// Build the "recommended for your group" banner text once, from the data
-// above — so it stays correct automatically if sleeps numbers or the
-// properties list ever change, instead of being hand-written.
-(function renderGroupRecommendation(){
-  const el = document.getElementById('groupRec');
-  if(!el) return;
+// What we're trying to keep the total around for a two-house booking.
+const PAIR_BUDGET_MIN = 10000;
+const PAIR_BUDGET_MAX = 11000;
 
-  const singleFits = properties.filter(p => p.recommended);
+function feetBetween(lat1, lng1, lat2, lng2){
+  const R = 20925721.8; // Earth's radius in feet
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1), dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
 
-  // Build each unique pairing once (skip the duplicate B→A direction).
-  const seenPairs = new Set();
-  const pairs = [];
+// Recomputed on initial load AND after every successful price refresh (see
+// runPriceCheck), so the per-card badges/notes below always reflect the
+// latest prices instead of going stale between refreshes.
+let recommendedPair = null;
+
+function computeRecommendations(){
+  // Reset any tags from a previous computation before recalculating.
   properties.forEach(p=>{
-    if(!p.pairsWith) return;
-    const partner = properties.find(pp => pp.name === p.pairsWith);
-    if(!partner) return;
-    const key = [p.name, partner.name].sort().join('|');
-    if(seenPairs.has(key)) return;
-    seenPairs.add(key);
-    pairs.push([p, partner]);
+    p.recommended = false;
+    p.recommendedPairPartner = null;
+    p.recommendedPairData = null;
   });
 
-  const parts = [];
-  if(singleFits.length){
-    const names = singleFits.map(p => `<strong>${p.name}</strong> (sleeps up to ${p.sleeps})`).join(' or ');
-    parts.push(`For the whole group (${GROUP_SIZE_MIN}–20 guests) in one house, ${names} fits everyone without splitting up.`);
-  }
-  if(pairs.length){
-    const pairText = pairs.map(([a,b]) => `<strong>${a.name}</strong> + <strong>${b.name}</strong> (next door to each other, ${a.sleeps + b.sleeps} combined)`).join(', or ');
-    parts.push(`Prefer two separate houses? ${pairText}.`);
-  }
+  properties.forEach((p,i) => {
+    p.idx = i+1;
+    p.lat = p.fallback[0];
+    p.lng = p.fallback[1];
+    p.best = {
+      r1: cheapest(p.offers.r1),
+      r2: cheapest(p.offers.r2)
+    };
+    // A single property can only ever be recommended alone if its OWN booking
+    // policy (not our bedroom math) allows a group this size.
+    p.recommended = (p.sleeps != null) && (p.sleeps >= GROUP_SIZE_MIN);
+  });
 
-  if(parts.length){
-    el.innerHTML = `👪 ${parts.join(' ')}`;
-    el.classList.add('show');
+  // Find every same-street pair, score the ones that could plausibly cover
+  // the group, and keep only the best one as "the" recommended pair — so the
+  // page points at one clear answer instead of listing every combination.
+  recommendedPair = (function findRecommendedPair(){
+    const byStreet = {};
+    properties.forEach(p=>{
+      if(!p.street) return; // e.g. Vista Del Mar — a different town, never paired
+      (byStreet[p.street] = byStreet[p.street] || []).push(p);
+    });
+
+    const candidates = [];
+    Object.values(byStreet).forEach(group=>{
+      for(let i=0;i<group.length;i++){
+        for(let j=i+1;j<group.length;j++){
+          const a = group[i], b = group[j];
+          const distanceFt = feetBetween(a.lat,a.lng,b.lat,b.lng);
+          const combinedBeds = a.beds + b.beds;
+          const combinedSleeps = (a.sleeps||0) + (b.sleeps||0);
+          const weeks = {};
+          ['r1','r2'].forEach(key=>{
+            if(a.best[key] && b.best[key]) weeks[key] = a.best[key].price + b.best[key].price;
+          });
+          if(Object.keys(weeks).length === 0) return; // no week both are priced for
+          if(combinedSleeps < GROUP_SIZE_MIN) return;  // wouldn't even cover the group on paper
+          // Only a candidate if at least one week comes in at or under the
+          // budget ceiling — being under $10k is fine, going past $11k isn't.
+          const qualifyingWeeks = Object.entries(weeks).filter(([,price]) => price <= PAIR_BUDGET_MAX);
+          if(qualifyingWeeks.length === 0) return;
+          const cheapestQualifying = Math.min(...qualifyingWeeks.map(([,price])=>price));
+          candidates.push({ a, b, distanceFt, combinedBeds, combinedSleeps, weeks, qualifyingWeeks, cheapestQualifying });
+        }
+      }
+    });
+
+    if(!candidates.length) return null;
+
+    // Rank: meeting the real bedroom count beats everything else, then
+    // closer properties, then whichever leaves the most budget headroom for
+    // taxes/fees that aren't in these subtotal prices.
+    candidates.sort((x,y)=>{
+      const bedsTierX = x.combinedBeds >= BEDROOMS_NEEDED_MIN ? 0 : 1;
+      const bedsTierY = y.combinedBeds >= BEDROOMS_NEEDED_MIN ? 0 : 1;
+      if(bedsTierX !== bedsTierY) return bedsTierX - bedsTierY;
+      if(Math.round(x.distanceFt/25) !== Math.round(y.distanceFt/25)) return x.distanceFt - y.distanceFt;
+      return x.cheapestQualifying - y.cheapestQualifying;
+    });
+
+    return candidates[0];
+  })();
+
+  if(recommendedPair){
+    recommendedPair.a.recommendedPairPartner = recommendedPair.b.name;
+    recommendedPair.b.recommendedPairPartner = recommendedPair.a.name;
+    recommendedPair.a.recommendedPairData = recommendedPair;
+    recommendedPair.b.recommendedPairData = recommendedPair;
   }
-})();
+}
+
+computeRecommendations();
 
 function offerRowHtml(key, offer, propName, inPopup){
   if(!offer){
@@ -873,21 +962,23 @@ function offerRowHtml(key, offer, propName, inPopup){
   const stale = blockedHosts.has(hostOf(offer.url));
   const sidePanel = isEmbeddable(offer.url)
     ? (inPopup
-        ? `<button class="row-icon-btn" onclick="openDrawer('${encodeURIComponent(offer.url)}','${propName.replace(/'/g,"\\'")}')" title="Open in side panel" aria-label="Open in side panel">⇲</button>`
-        : `<button class="row-icon-btn" data-url="${encodeURIComponent(offer.url)}" data-name="${propName.replace(/"/g,'&quot;')}" title="Open in side panel" aria-label="Open in side panel">⇲</button>`)
+        ? `<button class="row-panel-btn" onclick="openDrawer('${encodeURIComponent(offer.url)}','${propName.replace(/'/g,"\\'")}')" title="Open this listing in the side panel without leaving the map">See side panel</button>`
+        : `<button class="row-panel-btn" data-url="${encodeURIComponent(offer.url)}" data-name="${propName.replace(/"/g,'&quot;')}" title="Open this listing in the side panel without leaving the map">See side panel</button>`)
     : '';
   const safeName = propName.replace(/'/g,"\\'");
   const selectBtn = inPopup
-    ? `<button class="btn-select" onclick="openSelectionModal('${safeName}','${key}',${offer.price})">Select</button>`
-    : `<button class="btn-select" data-select-prop="${propName.replace(/"/g,'&quot;')}" data-select-range="${key}" data-select-price="${offer.price}">Select</button>`;
+    ? `<button class="btn-select" title="Lock in this property and date range as your family's pick — you'll confirm your name and group size next" onclick="openSelectionModal('${safeName}','${key}',${offer.price})">My Pick</button>`
+    : `<button class="btn-select" title="Lock in this property and date range as your family's pick — you'll confirm your name and group size next" data-select-prop="${propName.replace(/"/g,'&quot;')}" data-select-range="${key}" data-select-price="${offer.price}">My Pick</button>`;
   return `<div class="price-row ${highlight ? 'match' : ''}">
     <div class="price-row-info">
-      <span class="date-label">${RANGE_LABELS[key]}</span>
+      <span class="date-price-line">
+        <span class="date-label">${RANGE_LABELS[key]}</span>
+        <span class="amt">${fmt(offer.price)}</span>
+      </span>
       <span class="platform-tag">via ${offer.platform}${stale ? ' <span class="stale-note">*** Price not current, open to view live price</span>' : ''}</span>
     </div>
     <div class="price-row-actions">
-      <span class="amt">${fmt(offer.price)}</span>
-      <a class="row-link" href="${offer.url}" target="_blank" rel="noopener">View ↗</a>
+      <a class="row-link" href="${offer.url}" target="_blank" rel="noopener">View</a>
       ${sidePanel}
       ${selectBtn}
     </div>
@@ -937,13 +1028,20 @@ function specsText(p){
 }
 
 function pairsWithNoteHtml(p){
-  if(!p.pairsWith) return '';
-  return `<div class="pairs-note">🏠 Pairs with <strong>${p.pairsWith}</strong> — next door, for splitting a big group into two houses.</div>`;
+  if(!p.recommendedPairPartner) return '';
+  const d = p.recommendedPairData;
+  const weekList = Object.keys(d.weeks).map(k => RANGE_LABELS[k]).join(' & ');
+  return `<div class="pairs-note pairs-note-orange">🧡 Recommended <strong>together with ${p.recommendedPairPartner}</strong> — book both for the whole group (${Math.round(d.distanceFt)} ft apart, ${d.combinedBeds} bedrooms combined). This is one combined option for the trip, not two separate picks. Priced for ${weekList}.</div>`;
 }
 
 function recommendedBadgeHtml(p){
-  if(!p.recommended) return '';
-  return `<div class="recommended-badge">✓ Best fit for the whole group (${GROUP_SIZE_MIN}+ guests)</div>`;
+  if(p.recommended){
+    return `<div class="recommended-badge">✓ Best fit for the whole group (${GROUP_SIZE_MIN}+ guests)</div>`;
+  }
+  if(p.recommendedPairPartner){
+    return `<div class="recommended-badge recommended-badge-orange">✓ Best fit for the whole group (${GROUP_SIZE_MIN}+ guests) — together with ${p.recommendedPairPartner}</div>`;
+  }
+  return '';
 }
 
 function popupHtml(p){
@@ -964,7 +1062,8 @@ function renderList(){
   sorted.forEach(p=>{
     const show = matchesFilter(p);
     const card = document.createElement('div');
-    card.className = 'card' + (show ? '' : ' dimmed') + (p.recommended ? ' recommended' : '');
+    const highlightClass = p.recommended ? ' recommended' : (p.recommendedPairPartner ? ' recommended-pair' : '');
+    card.className = 'card' + (show ? '' : ' dimmed') + highlightClass;
     card.id = 'card-'+p.idx;
     card.tabIndex = 0;
     card.innerHTML = `
@@ -1174,8 +1273,11 @@ selectForm.addEventListener('submit', async (ev)=>{
 // live.
 const PRICES_URL = "data/prices.json";
 const BASELINE_VERIFIED = "Oct 3, 2026";
-const refreshBtn = document.getElementById('refreshBtn');
-const refreshIcon = document.getElementById('refreshIcon');
+// The GitHub Action re-checks prices every 3 hours on its own, but a
+// browser tab someone leaves open doesn't know that happened unless it
+// asks again. So instead of a manual button, this page quietly re-fetches
+// data/prices.json on its own timer — nothing for anyone to click.
+const AUTO_REFRESH_MS = 15 * 60 * 1000; // every 15 minutes while the tab is open
 const refreshStatus = document.getElementById('refreshStatus');
 const lastUpdatedEl = document.getElementById('lastUpdated');
 
@@ -1218,8 +1320,6 @@ function formatLocalTime(isoString){
 }
 
 async function runPriceCheck(isAuto){
-  refreshBtn.disabled = true;
-  refreshIcon.classList.add('spinning');
   refreshStatus.classList.add('show');
   refreshStatus.textContent = "Fetching the latest prices checked by the automated refresh…";
 
@@ -1236,6 +1336,11 @@ async function runPriceCheck(isAuto){
         .filter(([, s]) => s.blocked > 0)
         .map(([host]) => host)
     );
+
+    // Prices may have just changed, so recompute which listing(s) are the
+    // best fit for the group before re-rendering, instead of relying on
+    // whatever was true at page load.
+    computeRecommendations();
 
     renderList();
     updateMarkers();
@@ -1257,12 +1362,8 @@ async function runPriceCheck(isAuto){
       : "Still couldn't reach the automated price feed — showing the saved snapshot instead.";
   }
 
-  refreshIcon.classList.remove('spinning');
-  refreshBtn.disabled = false;
   setTimeout(()=>{ refreshStatus.classList.remove('show'); }, 6000);
 }
-
-refreshBtn.addEventListener('click', ()=> runPriceCheck(false));
 
 // ---- init ----
 buildMarkers();
@@ -1275,8 +1376,12 @@ if(mapAvailable){
   // Coordinates above are confirmed exact addresses — no live geocoding needed or run.
 }
 
-// Load the latest automated price check as soon as the page opens.
+// Load the latest automated price check as soon as the page opens, then
+// keep checking quietly in the background for as long as the tab stays
+// open — so a page someone leaves open all day still catches up with the
+// GitHub Action's 3-hour refreshes on its own, with nothing to click.
 runPriceCheck(true);
+setInterval(()=> runPriceCheck(true), AUTO_REFRESH_MS);
 </script>
 
 </body>
