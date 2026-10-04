@@ -317,10 +317,6 @@
     font-size:.76rem;
     color:var(--ink-soft);
   }
-  .price-row-info .stale-note{
-    color:#C0392B;
-    font-weight:700;
-  }
   .price-row-actions{
     display:flex;
     align-items:center;
@@ -632,7 +628,7 @@
     <button class="chip" data-range="r1">May 31 – Jun 5</button>
     <button class="chip" data-range="r2">Jun 7 – Jun 12</button>
   </div>
-  <p class="filter-note" id="filterNote">Showing all 12 options across both weeks.</p>
+  <p class="filter-note" id="filterNote">Loading live prices…</p>
   <p class="filter-note" id="selectHelp">Tapping <strong>My Pick</strong> on a listing records that property + date range as your family's pick — you'll confirm your name and group size right after, and it's saved to our shared list.</p>
 </header>
 
@@ -644,7 +640,7 @@
   </div>
 </div>
 
-<footer>Prices checked live on each listing site on Oct 3, 2026 — always confirm on the listing before booking, as rates can change.</footer>
+<footer>Every price shown here comes from the most recent automated check of the listing itself — nothing is a saved or estimated figure. Always confirm on the listing before booking, as rates can change.</footer>
 
 <div class="drawer-overlay" id="drawerOverlay"></div>
 <div class="drawer" id="drawer">
@@ -706,114 +702,131 @@ const properties = [
     beds:8, baths:5, amenity:"Pool", sleeps:16, street:"Mandalay Ave", fallback:[28.000500818655063,-82.82609675542467],
     offers:{
       r1:[
-        { platform:"Airbnb", price:9691, url:"https://www.airbnb.com/rooms/49227396?check_in=2027-05-31&check_out=2027-06-05" },
-        { platform:"Vrbo", price:9842, url:"https://www.vrbo.com/2284892?chkin=2027-05-31&chkout=2027-06-05&d1=2027-05-31&d2=2027-06-05&startDate=2027-05-31&endDate=2027-06-05&x_pwa=1&rfrr=HSR&pwa_ts=1791059723808&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=10759&destination=Clearwater%20Beach%2C%20Florida%2C%20United%20States%20of%20America&destType=BOUNDING_BOX&latLong=27.977474%2C-82.827931&amenities_facilities_group=private_pool%2Cair_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=0d35c51e-d501-4351-992b-626232172ec3&sort=RECOMMENDED&top_dp=1749&top_cur=USD&userIntent=&selectedRoomType=66895252&selectedRatePlan=0004c14c3f1edfa54af9a38ee7eb1fcc2235&expediaPropertyId=66895252&containsVideo=false" }
+        { platform:"Airbnb", url:"https://www.airbnb.com/rooms/49227396?check_in=2027-05-31&check_out=2027-06-05" },
+        { platform:"Vrbo", url:"https://www.vrbo.com/2284892?chkin=2027-05-31&chkout=2027-06-05&d1=2027-05-31&d2=2027-06-05&startDate=2027-05-31&endDate=2027-06-05&x_pwa=1&rfrr=HSR&pwa_ts=1791059723808&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=10759&destination=Clearwater%20Beach%2C%20Florida%2C%20United%20States%20of%20America&destType=BOUNDING_BOX&latLong=27.977474%2C-82.827931&amenities_facilities_group=private_pool%2Cair_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=0d35c51e-d501-4351-992b-626232172ec3&sort=RECOMMENDED&top_dp=1749&top_cur=USD&userIntent=&selectedRoomType=66895252&selectedRatePlan=0004c14c3f1edfa54af9a38ee7eb1fcc2235&expediaPropertyId=66895252&containsVideo=false" }
       ],
       r2:[
-        { platform:"Airbnb", price:11389, url:"https://www.airbnb.com/rooms/49227396?check_in=2027-06-07&check_out=2027-06-12" },
-        { platform:"Vrbo", price:11063, url:"https://www.vrbo.com/2284892?chkin=2027-06-07&chkout=2027-06-12&d1=2027-05-31&d2=2027-06-05&startDate=2027-06-07&endDate=2027-06-12&x_pwa=1&rfrr=HSR&pwa_ts=1791059723808&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=10759&destination=Clearwater+Beach%2C+Florida%2C+United+States+of+America&destType=BOUNDING_BOX&latLong=27.977474%2C-82.827931&amenities_facilities_group=private_pool%2Cair_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=25cfbe7d-4a5e-490c-9080-c153bd06d329&sort=RECOMMENDED&top_dp=1749&top_cur=USD&userIntent=&selectedRoomType=66895252&selectedRatePlan=0004c14c3f1edfa54af9a38ee7eb1fcc2235&expediaPropertyId=66895252&containsVideo=false" }
+        { platform:"Airbnb", url:"https://www.airbnb.com/rooms/49227396?check_in=2027-06-07&check_out=2027-06-12" },
+        { platform:"Vrbo", url:"https://www.vrbo.com/2284892?chkin=2027-06-07&chkout=2027-06-12&d1=2027-05-31&d2=2027-06-05&startDate=2027-06-07&endDate=2027-06-12&x_pwa=1&rfrr=HSR&pwa_ts=1791059723808&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=10759&destination=Clearwater+Beach%2C+Florida%2C+United+States+of+America&destType=BOUNDING_BOX&latLong=27.977474%2C-82.827931&amenities_facilities_group=private_pool%2Cair_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=25cfbe7d-4a5e-490c-9080-c153bd06d329&sort=RECOMMENDED&top_dp=1749&top_cur=USD&userIntent=&selectedRoomType=66895252&selectedRatePlan=0004c14c3f1edfa54af9a38ee7eb1fcc2235&expediaPropertyId=66895252&containsVideo=false" }
       ]
     } },
   { name:"Casa Del Mar", addr:"971 Eldorado Ave, Clearwater, FL 33767",
     beds:6, baths:4, amenity:"Pool", sleeps:12, street:"Eldorado Ave", fallback:[28.000716886230133,-82.82691719992422],
     offers:{
-      r1:[{ platform:"Direct", price:7009.20, url:"https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-05-31&co=2027-06-05" }],
-      r2:[{ platform:"Direct", price:7808.97, url:"https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-06-07&co=2027-06-12" }]
+      r1:[{ platform:"Direct", url:"https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-05-31&co=2027-06-05" }],
+      r2:[{ platform:"Direct", url:"https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-06-07&co=2027-06-12" }]
     } },
   { name:"Island Time", addr:"22 Laurel St, Clearwater, FL 33767",
     beds:6, baths:4, amenity:"Pool", sleeps:16, street:"Laurel St", fallback:[27.999657846405757,-82.82682132238308],
     offers:{
       r1:[
-        { platform:"Airbnb", price:8768, url:"https://www.airbnb.com/rooms/16474734?check_in=2027-05-31&check_out=2027-06-05" },
-        { platform:"Vrbo", price:11028, url:"https://www.vrbo.com/3247385ha?chkin=2027-05-31&chkout=2027-06-05" },
-        { platform:"Direct", price:9526.23, url:"https://sunnyorangestays.com/properties/island-time/?ci=2027-05-31&co=2027-06-05" },
-        { platform:"Whimstay", price:10064, url:"https://www.whimstay.com/detail/Island-Time-Huge-Pool-Home-Sleeps-18-Cabana-Bar-Steps-to-Beach-22-Laurel/dbe4be71a173998f90b416de48b18adf?check_in=2027-05-31&check_out=2027-06-05" }
+        { platform:"Airbnb", url:"https://www.airbnb.com/rooms/16474734?check_in=2027-05-31&check_out=2027-06-05" },
+        { platform:"Vrbo", url:"https://www.vrbo.com/3247385ha?chkin=2027-05-31&chkout=2027-06-05" },
+        { platform:"Direct", url:"https://sunnyorangestays.com/properties/island-time/?ci=2027-05-31&co=2027-06-05" },
+        { platform:"Whimstay", url:"https://www.whimstay.com/detail/Island-Time-Huge-Pool-Home-Sleeps-18-Cabana-Bar-Steps-to-Beach-22-Laurel/dbe4be71a173998f90b416de48b18adf?check_in=2027-05-31&check_out=2027-06-05" }
       ],
       r2:[
-        { platform:"Direct", price:10201.64, url:"https://sunnyorangestays.com/properties/island-time/?ci=2027-06-07&co=2027-06-12" },
-        { platform:"Whimstay", price:10776, url:"https://www.whimstay.com/detail/Island-Time-Huge-Pool-Home-Sleeps-18-Cabana-Bar-Steps-to-Beach-22-Laurel/dbe4be71a173998f90b416de48b18adf?check_in=2027-06-07&check_out=2027-06-12" }
+        { platform:"Direct", url:"https://sunnyorangestays.com/properties/island-time/?ci=2027-06-07&co=2027-06-12" },
+        { platform:"Whimstay", url:"https://www.whimstay.com/detail/Island-Time-Huge-Pool-Home-Sleeps-18-Cabana-Bar-Steps-to-Beach-22-Laurel/dbe4be71a173998f90b416de48b18adf?check_in=2027-06-07&check_out=2027-06-12" }
       ]
     } },
   { name:"Summer Breeze", addr:"770 Mandalay Ave, Clearwater, FL 33767",
     beds:7, baths:3, amenity:"Pool", sleeps:20, street:"Mandalay Ave", fallback:[27.992983667588863,-82.8270712577568],
     offers:{
       r1:[
-        { platform:"Direct", price:8882.66, url:"https://sunnyorangestays.com/properties/summer-breeze/?ci=2027-05-31&co=2027-06-05" },
-        { platform:"Vrbo", price:10312, url:"https://www.vrbo.com/4349678ha?chkin=2027-05-31&chkout=2027-06-05" },
-        { platform:"Whimstay", price:9384, url:"https://www.whimstay.com/detail/Summer-Breeze-Beachside-Pool-Home-Tiki-Bar-Sleeps-20-770-Mandalay/1761826f997f8890245f515bad34aed8?check_in=2027-05-31&check_out=2027-06-05" }
+        { platform:"Direct", url:"https://sunnyorangestays.com/properties/summer-breeze/?ci=2027-05-31&co=2027-06-05" },
+        { platform:"Vrbo", url:"https://www.vrbo.com/4349678ha?chkin=2027-05-31&chkout=2027-06-05" },
+        { platform:"Whimstay", url:"https://www.whimstay.com/detail/Summer-Breeze-Beachside-Pool-Home-Tiki-Bar-Sleeps-20-770-Mandalay/1761826f997f8890245f515bad34aed8?check_in=2027-05-31&check_out=2027-06-05" }
       ],
       r2:[
-        { platform:"Direct", price:10242.02, url:"https://sunnyorangestays.com/properties/summer-breeze/?ci=2027-06-07&co=2027-06-12" },
-        { platform:"Vrbo", price:11876, url:"https://www.vrbo.com/4349678ha?chkin=2027-06-07&chkout=2027-06-12" },
-        { platform:"Whimstay", price:10816, url:"https://www.whimstay.com/detail/Summer-Breeze-Beachside-Pool-Home-Tiki-Bar-Sleeps-20-770-Mandalay/1761826f997f8890245f515bad34aed8?check_in=2027-06-07&check_out=2027-06-12" }
+        { platform:"Direct", url:"https://sunnyorangestays.com/properties/summer-breeze/?ci=2027-06-07&co=2027-06-12" },
+        { platform:"Vrbo", url:"https://www.vrbo.com/4349678ha?chkin=2027-06-07&chkout=2027-06-12" },
+        { platform:"Whimstay", url:"https://www.whimstay.com/detail/Summer-Breeze-Beachside-Pool-Home-Tiki-Bar-Sleeps-20-770-Mandalay/1761826f997f8890245f515bad34aed8?check_in=2027-06-07&check_out=2027-06-12" }
       ]
     } },
   { name:"4-Bed Coastal Retreat", addr:"724 Mandalay Ave, Clearwater, FL 33767",
     beds:4, baths:2, amenity:"Pool", sleeps:10, street:"Mandalay Ave", fallback:[27.99098552264128,-82.82694752102778],
     offers:{
-      r1:[{ platform:"Vrbo", price:4637, url:"https://www.vrbo.com/2564331?chkin=2027-05-31&chkout=2027-06-05&d1=2027-05-31&d2=2027-06-05&startDate=2027-05-31&endDate=2027-06-05&x_pwa=1&rfrr=HSR&pwa_ts=1791059657035&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=10759&destination=Clearwater%20Beach%2C%20Florida%2C%20United%20States%20of%20America&destType=BOUNDING_BOX&latLong=27.977474%2C-82.827931&amenities_facilities_group=private_pool%2Cair_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=93591ac8-7ab1-4693-ba49-dcc2255cff4a&sort=RECOMMENDED&top_dp=921&top_cur=USD&userIntent=&selectedRoomType=73315199&selectedRatePlan=00048ed09a6d130941e39b3e6a0d51fd1a04&expediaPropertyId=73315199&containsVideo=false" }],
-      r2:[{ platform:"Vrbo", price:5070, url:"https://www.vrbo.com/2564331?chkin=2027-06-07&chkout=2027-06-12&d1=2027-05-31&d2=2027-06-05&startDate=2027-06-07&endDate=2027-06-12&x_pwa=1&rfrr=HSR&pwa_ts=1791059657035&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=10759&destination=Clearwater+Beach%2C+Florida%2C+United+States+of+America&destType=BOUNDING_BOX&latLong=27.977474%2C-82.827931&amenities_facilities_group=private_pool%2Cair_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=90feb2a8-18ac-420e-8300-e42b8d81f68a&sort=RECOMMENDED&top_dp=921&top_cur=USD&userIntent=&selectedRoomType=73315199&selectedRatePlan=00048ed09a6d130941e39b3e6a0d51fd1a04&expediaPropertyId=73315199&containsVideo=false" }]
+      r1:[
+        { platform:"Vrbo", url:"https://www.vrbo.com/2564331?chkin=2027-05-31&chkout=2027-06-05&d1=2027-05-31&d2=2027-06-05&startDate=2027-05-31&endDate=2027-06-05&x_pwa=1&rfrr=HSR&pwa_ts=1791059657035&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=10759&destination=Clearwater%20Beach%2C%20Florida%2C%20United%20States%20of%20America&destType=BOUNDING_BOX&latLong=27.977474%2C-82.827931&amenities_facilities_group=private_pool%2Cair_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=93591ac8-7ab1-4693-ba49-dcc2255cff4a&sort=RECOMMENDED&top_dp=921&top_cur=USD&userIntent=&selectedRoomType=73315199&selectedRatePlan=00048ed09a6d130941e39b3e6a0d51fd1a04&expediaPropertyId=73315199&containsVideo=false" },
+        { platform:"Airbnb", url:"https://www.airbnb.com/rooms/52600497?adults=8&check_in=2027-05-31&check_out=2027-06-05&guests=6&search_mode=regular_search&amenities%5B%5D=7&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=34&amenities%5B%5D=33&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=1811854569&source_impression_id=p3_1791146713_P3nq4q3Es8e8wfRC&previous_page_section_name=1001&federated_search_id=5312b0c6-4312-4e81-b984-76e8a64dc1a0" }
+      ],
+      r2:[
+        { platform:"Vrbo", url:"https://www.vrbo.com/2564331?chkin=2027-06-07&chkout=2027-06-12&d1=2027-05-31&d2=2027-06-05&startDate=2027-06-07&endDate=2027-06-12&x_pwa=1&rfrr=HSR&pwa_ts=1791059657035&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=10759&destination=Clearwater+Beach%2C+Florida%2C+United+States+of+America&destType=BOUNDING_BOX&latLong=27.977474%2C-82.827931&amenities_facilities_group=private_pool%2Cair_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=90feb2a8-18ac-420e-8300-e42b8d81f68a&sort=RECOMMENDED&top_dp=921&top_cur=USD&userIntent=&selectedRoomType=73315199&selectedRatePlan=00048ed09a6d130941e39b3e6a0d51fd1a04&expediaPropertyId=73315199&containsVideo=false" },
+        { platform:"Airbnb", url:"https://www.airbnb.com/rooms/52600497?adults=8&check_in=2027-06-07&check_out=2027-06-12&guests=6&search_mode=regular_search&amenities%5B%5D=7&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=34&amenities%5B%5D=33&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=1811854569&source_impression_id=p3_1791146587_P3M90CuHyOOqqSeW&previous_page_section_name=1001&federated_search_id=dd43953a-b874-4b25-855e-7aa2b3f32204" }
+      ]
     } },
   { name:"House & Cottage", addr:"847 Eldorado Ave, Clearwater, FL 33767",
     beds:4, baths:3, amenity:"Hot tub", sleeps:10, street:"Eldorado Ave", fallback:[27.995585042660206,-82.82752178649177],
     offers:{
-      r1:[{ platform:"Airbnb", price:4272, url:"https://www.airbnb.com/rooms/52600497?check_in=2027-05-31&check_out=2027-06-05" }],
-      r2:[{ platform:"Airbnb", price:4760, url:"https://www.airbnb.com/rooms/52600497?check_in=2027-06-07&check_out=2027-06-12" }]
+      r1:[
+        { platform:"Airbnb", url:"https://www.airbnb.com/rooms/20743029?adults=6&check_in=2027-05-31&check_out=2027-06-05&guests=6&search_mode=regular_search&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=367039524&source_impression_id=p3_1791149000_P39eAk5TAGwbXILP&previous_page_section_name=1001&federated_search_id=41c1477c-f4a9-410c-b25b-6c98d27eff7e" }
+      ],
+      r2:[
+        { platform:"Airbnb", url:"https://www.airbnb.com/rooms/20743029?adults=6&check_in=2027-06-07&check_out=2027-06-12&guests=6&search_mode=regular_search&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=367039524&source_impression_id=p3_1791149168_P3bQuF1MjT8L9hxA&previous_page_section_name=1001&federated_search_id=13bc342b-5523-4cf5-b395-0b6f2380b7cd" }
+      ]
     } },
   { name:"Gulf Front Dreams Beachfront Home", addr:"864 Eldorado Ave, Clearwater, FL 33767",
     beds:3, baths:2, amenity:"Small pool", sleeps:10, street:"Eldorado Ave", fallback:[27.996439353573592,-82.82793760351754],
     offers:{
-      r1:[{ platform:"Airbnb", price:6050, url:"https://www.airbnb.com/rooms/16283747?check_in=2027-05-31&check_out=2027-06-05" }],
+      r1:[{ platform:"Airbnb", url:"https://www.airbnb.com/rooms/16283747?check_in=2027-05-31&check_out=2027-06-05" }],
       r2:[]
     } },
   { name:"Starfish Beach House", addr:"18 Cambria St, Clearwater, FL 33767",
     beds:3, baths:3, amenity:"Pool", sleeps:12, street:"Cambria St", fallback:[27.988661972498726,-82.82729870027256],
     offers:{
       r1:[
-        { platform:"Airbnb", price:4014, url:"https://www.airbnb.com/rooms/17822693?check_in=2027-05-31&check_out=2027-06-05" },
-        { platform:"Vrbo", price:4076, url:"https://www.vrbo.com/1036056?chkin=2027-05-31&chkout=2027-06-05" }
+        { platform:"Airbnb", url:"https://www.airbnb.com/rooms/17822693?check_in=2027-05-31&check_out=2027-06-05" },
+        { platform:"Vrbo", url:"https://www.vrbo.com/1036056?chkin=2027-05-31&chkout=2027-06-05" }
       ],
       r2:[]
     } },
   { name:"Coastal Beach Retreat", addr:"26 Cambria St, Clearwater, FL 33767",
     beds:5, baths:3, amenity:"Pool", sleeps:14, street:"Cambria St", fallback:[27.98864308387402,-82.82694563693613],
     offers:{
-      r1:[{ platform:"Airbnb", price:5528, url:"https://www.airbnb.com/rooms/1508125906855926055?check_in=2027-05-31&check_out=2027-06-05" }],
+      r1:[{ platform:"Airbnb", url:"https://www.airbnb.com/rooms/1508125906855926055?check_in=2027-05-31&check_out=2027-06-05" }],
+      r2:[]
+    } },
+  { name:"Clearwater Beach Cottage", addr:"22 Cambria St, Clearwater Beach, FL 33767",
+    beds:4, baths:4, amenity:"No pool", sleeps:12, street:"Cambria St", fallback:[27.988634420653376,-82.8271205985184],
+    offers:{
+      r1:[{ platform:"Airbnb", url:"https://www.airbnb.com/rooms/1005043652152471558?adults=8&check_in=2027-05-31&check_out=2027-06-05&guests=6&search_mode=regular_search&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=8&amenities%5B%5D=4&amenities%5B%5D=33&amenities%5B%5D=34&amenities%5B%5D=58&photo_id=1762819634&source_impression_id=p3_1791151807_P3IH1jWqutQjd73B&previous_page_section_name=1001&federated_search_id=eac38a16-67bf-4228-9c15-5f42a9d9928c" }],
       r2:[]
     } },
   { name:"Vista Del Mar", addr:"19532 Gulf Blvd, Indian Shores, FL 33785",
     beds:6, baths:7, amenity:"Pool", sleeps:15, sleepsApprox:true, fallback:[27.85325944760097,-82.84587280631597],
     offers:{
       r1:[
-        { platform:"Direct", price:11157.62, url:"https://clearwaterbeachrentals.guestybookings.com/en/properties/66c4e027e65c370013ea0b7d?checkIn=2027-05-31&checkOut=2027-06-05&adults=15" },
-        { platform:"Booking.com", price:11576, url:"https://www.booking.com/hotel/us/vista-del-mar-villa-by-goldencoastrentals.en-us.html?checkin=2027-05-31&checkout=2027-06-05&group_adults=15" }
+        { platform:"Direct", url:"https://clearwaterbeachrentals.guestybookings.com/en/properties/66c4e027e65c370013ea0b7d?checkIn=2027-05-31&checkOut=2027-06-05&adults=15" },
+        { platform:"Booking.com", url:"https://www.booking.com/hotel/us/vista-del-mar-villa-by-goldencoastrentals.html?label=mkt123sc-50f8ad5f-514f-4fab-b839-82d99869ae1d&aid=304142&ucfs=1&checkin=2027-05-31&checkout=2027-06-05&dest_id=20021863&dest_type=city&group_adults=16&no_rooms=6&group_children=0&srpvid=734c92835b910092&srepoch=1791147164&all_sr_blocks=1556361801_426769148_21_0_0&highlighted_blocks=1556361801_426769148_21_0_0&matching_block_id=1556361801_426769148_21_0_0&atlas_src=sr_iw_title" }
       ],
       r2:[
-        { platform:"Direct", price:11859.35, url:"https://clearwaterbeachrentals.guestybookings.com/en/properties/66c4e027e65c370013ea0b7d?checkIn=2027-06-07&checkOut=2027-06-12&adults=15" }
+        { platform:"Direct", url:"https://clearwaterbeachrentals.guestybookings.com/en/properties/66c4e027e65c370013ea0b7d?checkIn=2027-06-07&checkOut=2027-06-12&adults=15" },
+        { platform:"Booking.com", url:"https://www.booking.com/hotel/us/vista-del-mar-villa-by-goldencoastrentals.html?aid=304142&label=mkt123sc-ef2a859e-7795-4df9-bf75-7aca6c5e9f06&ucfs=1&checkin=2027-06-07&checkout=2027-06-12&dest_id=20021863&dest_type=city&group_adults=16&no_rooms=6&group_children=0&srpvid=46f692e6faa3029c&srepoch=1791147242&all_sr_blocks=1556361801_426769148_21_0_0&highlighted_blocks=1556361801_426769148_21_0_0&matching_block_id=1556361801_426769148_21_0_0&atlas_src=sr_iw_title" }
       ]
     } },
   { name:"Akoya House at The Gemma", addr:"19 Somerset St, Clearwater, FL 33767",
     beds:6, baths:6.5, amenity:"Pool", sleeps:14, street:"Somerset St", fallback:[27.988947,-82.827269],
     offers:{
       r1:[
-        { platform:"Airbnb", price:12972, url:"https://www.airbnb.com/rooms/1126781564607655572?check_in=2027-05-31&check_out=2027-06-05" },
-        { platform:"Direct", price:12828.89, url:"https://booking.thegemmacwb.com/en/properties/6557b587d20bd0005a4b1a2e?minOccupancy=14&checkIn=2027-05-31&checkOut=2027-06-05&adults=14" }
+        { platform:"Airbnb", url:"https://www.airbnb.com/rooms/1126781564607655572?adults=8&check_in=2027-05-31&check_out=2027-06-05&guests=6&search_mode=regular_search&amenities%5B%5D=7&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=34&amenities%5B%5D=33&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=2189793986&source_impression_id=p3_1791146162_P3_b2qG3LJXVqeZP&previous_page_section_name=1001&federated_search_id=df4ce87b-79f6-452e-bf33-fb0b8188fd31" },
+        { platform:"Direct", url:"https://booking.thegemmacwb.com/en/properties/6557b587d20bd0005a4b1a2e?minOccupancy=14&checkIn=2027-05-31&checkOut=2027-06-05&adults=14" }
       ],
       r2:[
-        { platform:"Airbnb", price:13315, url:"https://www.airbnb.com/rooms/1126781564607655572?check_in=2027-06-07&check_out=2027-06-12" },
-        { platform:"Direct", price:13170.15, url:"https://booking.thegemmacwb.com/en/properties/6557b587d20bd0005a4b1a2e?minOccupancy=14&checkIn=2027-06-07&checkOut=2027-06-12&adults=14" }
+        { platform:"Airbnb", url:"https://www.airbnb.com/rooms/1126781564607655572?adults=8&check_in=2027-06-07&check_out=2027-06-12&guests=6&search_mode=regular_search&amenities%5B%5D=7&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=34&amenities%5B%5D=33&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=2189793986&source_impression_id=p3_1791146248_P3kMNLBr96PLv7Ea&previous_page_section_name=1001&federated_search_id=cad76316-5ad8-402a-bce2-bba466d0416e" },
+        { platform:"Direct", url:"https://booking.thegemmacwb.com/en/properties/6557b587d20bd0005a4b1a2e?minOccupancy=14&checkIn=2027-06-07&checkOut=2027-06-12&adults=14" }
       ]
     } },
   { name:"Pearl House at The Gemma", addr:"21 Somerset St, Clearwater, FL 33767",
     beds:6, baths:6.5, amenity:"Pool", sleeps:14, street:"Somerset St", fallback:[27.988959,-82.827099],
     offers:{
       r1:[
-        { platform:"Airbnb", price:12972, url:"https://www.airbnb.com/rooms/1131137832485760959?check_in=2027-05-31&check_out=2027-06-05" },
-        { platform:"Direct", price:12828.89, url:"https://booking.thegemmacwb.com/en/properties/6557b6747c64d0003c7e532e?minOccupancy=14&checkIn=2027-05-31&checkOut=2027-06-05&adults=14" }
+        { platform:"Airbnb", url:"https://www.airbnb.com/rooms/1131137832485760959?adults=8&check_in=2027-05-31&check_out=2027-06-05&guests=6&search_mode=regular_search&amenities%5B%5D=7&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=34&amenities%5B%5D=33&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=1879873769&source_impression_id=p3_1791146170_P3tS0eRHk2st-j2e&previous_page_section_name=1001&federated_search_id=e57d2909-f8f8-4cd0-8914-5fc42c16347c" },
+        { platform:"Direct", url:"https://booking.thegemmacwb.com/en/properties/6557b6747c64d0003c7e532e?minOccupancy=14&checkIn=2027-05-31&checkOut=2027-06-05&adults=14" }
       ],
       r2:[
-        { platform:"Airbnb", price:13315, url:"https://www.airbnb.com/rooms/1131137832485760959?check_in=2027-06-07&check_out=2027-06-12" },
-        { platform:"Direct", price:13170.15, url:"https://booking.thegemmacwb.com/en/properties/6557b6747c64d0003c7e532e?minOccupancy=14&checkIn=2027-06-07&checkOut=2027-06-12&adults=14" }
+        { platform:"Airbnb", url:"https://www.airbnb.com/rooms/1131137832485760959?adults=8&check_in=2027-06-07&check_out=2027-06-12&guests=6&search_mode=regular_search&amenities%5B%5D=7&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=34&amenities%5B%5D=33&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=1879873769&source_impression_id=p3_1791146258_P3W7t64CqcCfQYEl&previous_page_section_name=1001&federated_search_id=cad76316-5ad8-402a-bce2-bba466d0416e" },
+        { platform:"Direct", url:"https://booking.thegemmacwb.com/en/properties/6557b6747c64d0003c7e532e?minOccupancy=14&checkIn=2027-06-07&checkOut=2027-06-12&adults=14" }
       ]
     } },
   { name:"Sea Breeze", addr:"1040 Bay Esplanade, Clearwater, FL 33767",
@@ -821,20 +834,20 @@ const properties = [
     offers:{
       r1:[],
       r2:[
-        { platform:"Airbnb", price:6442, url:"https://www.airbnb.com/rooms/20813370?adults=8&check_in=2027-06-07&check_out=2027-06-12&search_mode=regular_search&amenities%5B%5D=58&amenities%5B%5D=33&amenities%5B%5D=34&amenities%5B%5D=9&amenities%5B%5D=5&amenities%5B%5D=4&amenities%5B%5D=8&amenities%5B%5D=7&photo_id=369091920&source_impression_id=p3_1791056338_P3wsKyYYtCZhEfOr&previous_page_section_name=1001&federated_search_id=54377898-c351-49bc-b4b0-323cc23e1fca" },
-        { platform:"Vrbo", price:6348, url:"https://www.vrbo.com/515046?chkin=2027-06-07&chkout=2027-06-12&d1=2027-06-07&d2=2027-06-12&startDate=2027-06-07&endDate=2027-06-12&x_pwa=1&rfrr=HSR&pwa_ts=1791061484537&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=553248635976481268&destination=Carlouel%2C%20Clearwater%20Beach%2C%20Florida%2C%20United%20States%20of%20America&destType=BOUNDING_BOX&neighborhoodId=553248635976481268&latLong=28.002338%2C-82.825397&amenities_facilities_group=air_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=e14a6a52-ad12-4e4c-a60a-712abbfcc746&sort=RECOMMENDED&top_dp=1117&top_cur=USD&userIntent=&selectedRoomType=18978146&selectedRatePlan=00046a53e47c94644177b42d8db1f15371cb&expediaPropertyId=18978146&containsVideo=false" }
+        { platform:"Airbnb", url:"https://www.airbnb.com/rooms/20813370?adults=8&check_in=2027-06-07&check_out=2027-06-12&search_mode=regular_search&amenities%5B%5D=58&amenities%5B%5D=33&amenities%5B%5D=34&amenities%5B%5D=9&amenities%5B%5D=5&amenities%5B%5D=4&amenities%5B%5D=8&amenities%5B%5D=7&photo_id=369091920&source_impression_id=p3_1791056338_P3wsKyYYtCZhEfOr&previous_page_section_name=1001&federated_search_id=54377898-c351-49bc-b4b0-323cc23e1fca" },
+        { platform:"Vrbo", url:"https://www.vrbo.com/515046?chkin=2027-06-07&chkout=2027-06-12&d1=2027-06-07&d2=2027-06-12&startDate=2027-06-07&endDate=2027-06-12&x_pwa=1&rfrr=HSR&pwa_ts=1791061484537&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=553248635976481268&destination=Carlouel%2C%20Clearwater%20Beach%2C%20Florida%2C%20United%20States%20of%20America&destType=BOUNDING_BOX&neighborhoodId=553248635976481268&latLong=28.002338%2C-82.825397&amenities_facilities_group=air_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=e14a6a52-ad12-4e4c-a60a-712abbfcc746&sort=RECOMMENDED&top_dp=1117&top_cur=USD&userIntent=&selectedRoomType=18978146&selectedRatePlan=00046a53e47c94644177b42d8db1f15371cb&expediaPropertyId=18978146&containsVideo=false" }
       ]
     } },
   { name:"Walk to Beach House", addr:"976 Mandalay Ave, Clearwater, FL 33767",
     beds:4, baths:2, amenity:"Pool", sleeps:10, street:"Mandalay Ave", fallback:[28.001262643904788,-82.82632175673426],
     offers:{
       r1:[
-        { platform:"Airbnb", price:4221, url:"https://www.airbnb.com/rooms/1616961551420532760?adults=8&check_in=2027-05-31&check_out=2027-06-05&search_mode=regular_search&amenities%5B0%5D=58&amenities%5B1%5D=33&amenities%5B2%5D=34&amenities%5B3%5D=9&amenities%5B4%5D=5&amenities%5B5%5D=4&amenities%5B6%5D=8&amenities%5B7%5D=7&photo_id=2814119387&source_impression_id=p3_1791056306_P3TpMwMXBgBZipMt&previous_page_section_name=1001&federated_search_id=29367616-ec9f-4765-93b2-b2febfb49e42&guests=1" },
-        { platform:"Vrbo", price:4057, url:"https://www.vrbo.com/5092095?chkin=2027-05-31&chkout=2027-06-05&d1=2027-05-31&d2=2027-06-05&startDate=2027-05-31&endDate=2027-06-05&x_pwa=1&rfrr=HSR&pwa_ts=1791059770923&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=553248635976481268&destination=Carlouel%2C%20Clearwater%20Beach%2C%20Florida%2C%20United%20States%20of%20America&destType=BOUNDING_BOX&neighborhoodId=553248635976481268&latLong=28.002338%2C-82.825397&amenities_facilities_group=private_pool%2Cair_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=c84825af-a5e3-46c3-81dd-b0971f371352&sort=RECOMMENDED&top_dp=807&top_cur=USD&userIntent=&selectedRoomType=126000564&selectedRatePlan=0004f30576b3691c49669700d24d60bc1f6f&expediaPropertyId=126000564&containsVideo=false&pwaThumbnailDialog=thumbnail-gallery" }
+        { platform:"Airbnb", url:"https://www.airbnb.com/rooms/1616961551420532760?adults=8&check_in=2027-05-31&check_out=2027-06-05&search_mode=regular_search&amenities%5B0%5D=58&amenities%5B1%5D=33&amenities%5B2%5D=34&amenities%5B3%5D=9&amenities%5B4%5D=5&amenities%5B5%5D=4&amenities%5B6%5D=8&amenities%5B7%5D=7&photo_id=2814119387&source_impression_id=p3_1791056306_P3TpMwMXBgBZipMt&previous_page_section_name=1001&federated_search_id=29367616-ec9f-4765-93b2-b2febfb49e42&guests=1" },
+        { platform:"Vrbo", url:"https://www.vrbo.com/5092095?chkin=2027-05-31&chkout=2027-06-05&d1=2027-05-31&d2=2027-06-05&startDate=2027-05-31&endDate=2027-06-05&x_pwa=1&rfrr=HSR&pwa_ts=1791059770923&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=553248635976481268&destination=Carlouel%2C%20Clearwater%20Beach%2C%20Florida%2C%20United%20States%20of%20America&destType=BOUNDING_BOX&neighborhoodId=553248635976481268&latLong=28.002338%2C-82.825397&amenities_facilities_group=private_pool%2Cair_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=c84825af-a5e3-46c3-81dd-b0971f371352&sort=RECOMMENDED&top_dp=807&top_cur=USD&userIntent=&selectedRoomType=126000564&selectedRatePlan=0004f30576b3691c49669700d24d60bc1f6f&expediaPropertyId=126000564&containsVideo=false&pwaThumbnailDialog=thumbnail-gallery" }
       ],
       r2:[
-        { platform:"Airbnb", price:4314, url:"https://www.airbnb.com/rooms/1616961551420532760?adults=8&check_in=2027-06-07&check_out=2027-06-12&search_mode=regular_search&amenities%5B%5D=58&amenities%5B%5D=33&amenities%5B%5D=34&amenities%5B%5D=9&amenities%5B%5D=5&amenities%5B%5D=4&amenities%5B%5D=8&amenities%5B%5D=7&photo_id=2814119387&source_impression_id=p3_1791056306_P3TpMwMXBgBZipMt&previous_page_section_name=1001&federated_search_id=29367616-ec9f-4765-93b2-b2febfb49e42" },
-        { platform:"Vrbo", price:4146, url:"https://www.vrbo.com/5092095?chkin=2027-06-07&chkout=2027-06-12&d1=2027-05-31&d2=2027-06-05&startDate=2027-06-07&endDate=2027-06-12&x_pwa=1&rfrr=HSR&pwa_ts=1791059770923&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=553248635976481268&destination=Carlouel%2C+Clearwater+Beach%2C+Florida%2C+United+States+of+America&destType=BOUNDING_BOX&neighborhoodId=553248635976481268&latLong=28.002338%2C-82.825397&amenities_facilities_group=private_pool%2Cair_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=820b00b5-3273-448e-b890-ac6af3fce0be&sort=RECOMMENDED&top_dp=807&top_cur=USD&userIntent=&selectedRoomType=126000564&selectedRatePlan=0004f30576b3691c49669700d24d60bc1f6f&expediaPropertyId=126000564&containsVideo=false" }
+        { platform:"Airbnb", url:"https://www.airbnb.com/rooms/1616961551420532760?adults=8&check_in=2027-06-07&check_out=2027-06-12&search_mode=regular_search&amenities%5B%5D=58&amenities%5B%5D=33&amenities%5B%5D=34&amenities%5B%5D=9&amenities%5B%5D=5&amenities%5B%5D=4&amenities%5B%5D=8&amenities%5B%5D=7&photo_id=2814119387&source_impression_id=p3_1791056306_P3TpMwMXBgBZipMt&previous_page_section_name=1001&federated_search_id=29367616-ec9f-4765-93b2-b2febfb49e42" },
+        { platform:"Vrbo", url:"https://www.vrbo.com/5092095?chkin=2027-06-07&chkout=2027-06-12&d1=2027-05-31&d2=2027-06-05&startDate=2027-06-07&endDate=2027-06-12&x_pwa=1&rfrr=HSR&pwa_ts=1791059770923&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=553248635976481268&destination=Carlouel%2C+Clearwater+Beach%2C+Florida%2C+United+States+of+America&destType=BOUNDING_BOX&neighborhoodId=553248635976481268&latLong=28.002338%2C-82.825397&amenities_facilities_group=private_pool%2Cair_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=820b00b5-3273-448e-b890-ac6af3fce0be&sort=RECOMMENDED&top_dp=807&top_cur=USD&userIntent=&selectedRoomType=126000564&selectedRatePlan=0004f30576b3691c49669700d24d60bc1f6f&expediaPropertyId=126000564&containsVideo=false" }
       ]
     } }
 ];
@@ -849,10 +862,28 @@ function isEmbeddable(url){
   return !/airbnb\.com|vrbo\.com|booking\.com|whimstay\.com|guestybookings\.com/i.test(url);
 }
 
-// Cheapest offer in an array, or null if there are none for that date range.
+// Every price on this page comes from the automated live check — never a
+// number saved in this file. livePrices maps a listing URL to the price the
+// most recent successful scrape found for it; an offer with no entry here
+// has no confirmed price and is treated as unavailable, not shown with a
+// stale guess.
+let livePrices = {};
+
+// Cheapest CONFIRMED offer in an array, or null if none of them have a
+// live price yet. An offer whose URL isn't in livePrices (not yet checked,
+// or the last check of it failed/was blocked) is skipped entirely — it
+// never falls back to an old number.
 function cheapest(offersArr){
   if(!offersArr || !offersArr.length) return null;
-  return offersArr.reduce((a,b) => b.price < a.price ? b : a);
+  const priced = offersArr
+    .map(o => ({ offer:o, price: livePrices[o.url] }))
+    .filter(x => typeof x.price === 'number');
+  if(!priced.length) return null;
+  const best = priced.reduce((a,b) => b.price < a.price ? b : a);
+  // Return the offer object with its live price attached, without mutating
+  // the original offer (so re-running this after a refresh never leaves a
+  // previous run's price sitting on an object that no longer has one).
+  return { ...best.offer, price: best.price };
 }
 
 let currentFilter = "all";
@@ -997,11 +1028,8 @@ function computeRecommendations(){
     p.recommendedPairData = null;
   });
 
-  // Assign each property's number from the shared largest-first order,
-  // so pin numbers on the map and card numbers in the list always match
-  // and always read in sequence.
-  [...properties].sort(bySizeThenName).forEach((p,i)=>{ p.idx = i+1; });
-
+  // Prices first: a property only counts as "showing" once we know whether
+  // it has any confirmed live price at all.
   properties.forEach((p) => {
     p.lat = p.fallback[0];
     p.lng = p.fallback[1];
@@ -1009,6 +1037,20 @@ function computeRecommendations(){
       r1: cheapest(p.offers.r1),
       r2: cheapest(p.offers.r2)
     };
+    p.hasAnyPrice = (p.best.r1 != null) || (p.best.r2 != null);
+  });
+
+  // Assign each property's number from the shared largest-first order —
+  // but only among properties currently showing a confirmed price, so pin
+  // and card numbers stay a gap-free 1..N for exactly what's on screen,
+  // never counting a listing that isn't showing right now.
+  [...properties]
+    .filter(p => p.hasAnyPrice)
+    .sort(bySizeThenName)
+    .forEach((p,i)=>{ p.idx = i+1; });
+  properties.forEach(p=>{ if(!p.hasAnyPrice) p.idx = null; });
+
+  properties.forEach((p) => {
     // A single property is a "best fit" if EITHER path clears the group:
     // the host's own stated max occupancy already covers 18+ guests, OR
     // the property simply has enough private bedrooms (8+) to give every
@@ -1086,7 +1128,6 @@ function offerRowHtml(key, offer, propName, inPopup){
     return '';
   }
   const highlight = currentFilter === key;
-  const stale = blockedHosts.has(hostOf(offer.url));
   const sidePanel = isEmbeddable(offer.url)
     ? (inPopup
         ? `<button class="row-panel-btn" onclick="openDrawer('${encodeURIComponent(offer.url)}','${propName.replace(/'/g,"\\'")}')" title="Open this listing in the side panel without leaving the map">See side panel</button>`
@@ -1102,7 +1143,7 @@ function offerRowHtml(key, offer, propName, inPopup){
         <span class="date-label">${RANGE_LABELS[key]}</span>
         <span class="amt">${fmt(offer.price)}</span>
       </span>
-      <span class="platform-tag">via ${offer.platform}${stale ? ' <span class="stale-note">*** Click \'View\' for live price</span>' : ''}</span>
+      <span class="platform-tag">via ${offer.platform}</span>
     </div>
     <div class="price-row-actions">
       <a class="row-link" href="${offer.url}" target="_blank" rel="noopener">View</a>
@@ -1124,17 +1165,49 @@ function priceRowsHtml(p, inPopup){
   return `<div class="price-row na"><span>${reason}</span></div>`;
 }
 
+// Shared by the filter chips and by each price refresh, so the note above
+// the list always reflects how many listings currently have a confirmed
+// live price — not a fixed "12 options" count that assumes every listing
+// is priced.
+function updateFilterNote(){
+  const note = document.getElementById('filterNote');
+  const priced = properties.filter(p=>p.hasAnyPrice);
+  if(currentFilter === 'all'){
+    note.textContent = priced.length
+      ? `Showing the lowest confirmed live rate for each week, side by side — ${priced.length} option${priced.length===1?'':'s'} with a live price right now.`
+      : "No confirmed live prices right now — checking again shortly.";
+  } else {
+    const count = priced.filter(p=>matchesFilter(p)).length;
+    note.textContent = `Highlighting the ${count} option${count===1?'':'s'} available for ${RANGE_LABELS[currentFilter]}. The rest are greyed out.`;
+  }
+}
+
 function matchesFilter(p){
+  // A listing with no confirmed live price at all is never shown, under
+  // any filter — it's excluded from the results entirely (see renderList
+  // and buildMarkers), so this never actually gets asked about it, but the
+  // check stays here too as a safeguard.
+  if(!p.hasAnyPrice) return false;
   if(currentFilter === "all") return true;
   if(currentFilter === "r1") return p.best.r1 != null;
   if(currentFilter === "r2") return p.best.r2 != null;
   return true;
 }
 
-const markers = {};
+let markers = {};
+// Removes every current marker from the map so buildMarkers() can redraw
+// from scratch on each price refresh — without this, a property that loses
+// its last confirmed price would leave a stale pin behind forever.
+function clearMarkers(){
+  Object.values(markers).forEach(m => map.removeLayer(m));
+  markers = {};
+}
 function buildMarkers(){
   if(!mapAvailable) return;
+  clearMarkers();
   properties.forEach(p=>{
+    // No confirmed price for this listing right now — no pin for it either.
+    if(!p.hasAnyPrice) return;
     const marker = L.marker([p.lat,p.lng], { icon: pinIcon(p.idx,false) }).addTo(map);
     // minWidth/maxWidth widened from Leaflet's ~300px default so the same
     // price-row layout used in the list cards doesn't wrap awkwardly here.
@@ -1189,9 +1262,16 @@ function popupHtml(p){
 function renderList(){
   const col = document.getElementById('listCol');
   col.innerHTML = "";
-  // Same order p.idx was numbered from — keeps the card numbers reading
-  // in sequence (1, 2, 3…) top to bottom, matching the map pins exactly.
-  const sorted = [...properties].sort(bySizeThenName);
+  // Only listings with at least one confirmed live price are ever shown —
+  // same order p.idx was numbered from, so card numbers read in sequence
+  // (1, 2, 3…) top to bottom, matching the map pins exactly.
+  const sorted = [...properties].filter(p=>p.hasAnyPrice).sort(bySizeThenName);
+
+  if(!sorted.length){
+    col.innerHTML = `<div class="price-row na"><span>No confirmed live prices right now — the automated check runs every few hours. This page keeps checking in the background, so it'll fill in on its own once new prices come in.</span></div>`;
+    return;
+  }
+
   sorted.forEach(p=>{
     const show = matchesFilter(p);
     const card = document.createElement('div');
@@ -1245,6 +1325,7 @@ function highlightCard(idx){
 function updateMarkers(){
   if(!mapAvailable) return;
   properties.forEach(p=>{
+    if(!p.hasAnyPrice || !markers[p.idx]) return; // no pin exists for this listing right now
     const show = matchesFilter(p);
     markers[p.idx].setIcon(pinIcon(p.idx, !show));
     markers[p.idx].setOpacity(show ? 1 : 0.35);
@@ -1257,13 +1338,7 @@ document.querySelectorAll('.chip').forEach(chip=>{
     document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
     chip.classList.add('active');
     currentFilter = chip.dataset.range;
-    const note = document.getElementById('filterNote');
-    if(currentFilter === 'all'){
-      note.textContent = "Showing the lowest available rate for each week, side by side.";
-    } else {
-      const count = properties.filter(p=>matchesFilter(p)).length;
-      note.textContent = `Highlighting the ${count} option${count===1?'':'s'} available for ${RANGE_LABELS[currentFilter]}. The rest are greyed out.`;
-    }
+    updateFilterNote();
     renderList();
     updateMarkers();
   });
@@ -1410,14 +1485,13 @@ selectForm.addEventListener('submit', async (ev)=>{
 // on a schedule, re-checks every booking link with a real headless browser
 // server-side (so it isn't blocked by CORS the way this page's own
 // JavaScript would be), and commits the results to data/prices.json next
-// to this file. This page just fetches that JSON and overlays it onto the
-// snapshot baked in above. If the fetch fails for any reason — opened as a
-// local file instead of through the hosted link, the Action hasn't run
-// yet, a network hiccup — it quietly keeps showing the baked-in snapshot
-// instead of breaking, and says so plainly rather than pretending it's
-// live.
+// to this file. This page fetches that JSON and uses it as the ONLY source
+// of prices — there is no baked-in snapshot to fall back to. If a listing's
+// most recent check didn't come back with a price (blocked, errored, or
+// just not checked yet), that listing simply has no confirmed price right
+// now and is left out of the results, rather than showing a number that's
+// no longer verified.
 const PRICES_URL = "data/prices.json";
-const BASELINE_VERIFIED = "Oct 3, 2026";
 // The GitHub Action re-checks prices every 3 hours on its own, but a
 // browser tab someone leaves open doesn't know that happened unless it
 // asks again. So instead of a manual button, this page quietly re-fetches
@@ -1425,31 +1499,6 @@ const BASELINE_VERIFIED = "Oct 3, 2026";
 const AUTO_REFRESH_MS = 15 * 60 * 1000; // every 15 minutes while the tab is open
 const refreshStatus = document.getElementById('refreshStatus');
 const lastUpdatedEl = document.getElementById('lastUpdated');
-
-// Hostnames whose automated check was blocked (bot-check/CAPTCHA page
-// instead of a real price) on the most recent refresh. offerRowHtml reads
-// this to flag the specific row as stale rather than banner text up top.
-let blockedHosts = new Set();
-
-function hostOf(url){
-  try { return new URL(url).host; } catch(e){ return ''; }
-}
-
-function applyPriceOverlay(offersByUrl){
-  let matched = 0;
-  properties.forEach(p=>{
-    ['r1','r2'].forEach(key=>{
-      (p.offers[key] || []).forEach(offer=>{
-        if(Object.prototype.hasOwnProperty.call(offersByUrl, offer.url)){
-          offer.price = offersByUrl[offer.url];
-          matched++;
-        }
-      });
-    });
-    p.best = { r1: cheapest(p.offers.r1), r2: cheapest(p.offers.r2) };
-  });
-  return matched;
-}
 
 function formatLocalTime(isoString){
   try{
@@ -1485,6 +1534,20 @@ function formatLocalTime(isoString){
   }
 }
 
+// Fits the map to whatever markers currently exist, but only the first
+// time it succeeds — otherwise every 15-minute auto-refresh would recenter
+// and rezoom the map out from under someone who's already zoomed in on a
+// specific property.
+let hasFitBoundsOnce = false;
+function fitMapToMarkersOnce(){
+  if(!mapAvailable || hasFitBoundsOnce) return;
+  const group = L.featureGroup(Object.values(markers));
+  if(!group.getBounds().isValid()) return; // no priced listings yet — nothing to fit to
+  map.fitBounds(group.getBounds().pad(0.2));
+  hasFitBoundsOnce = true;
+  // Coordinates above are confirmed exact addresses — no live geocoding needed or run.
+}
+
 async function runPriceCheck(isAuto){
   refreshStatus.classList.add('show');
   refreshStatus.textContent = "Fetching the latest prices checked by the automated refresh…";
@@ -1493,60 +1556,54 @@ async function runPriceCheck(isAuto){
     const res = await fetch(PRICES_URL + "?t=" + Date.now(), { cache:"no-store" });
     if(!res.ok) throw new Error("prices.json not available (status " + res.status + ")");
     const data = await res.json();
-    const matched = applyPriceOverlay(data.offers || {});
 
-    // Build the blocked-host set BEFORE rendering, so each affected row
-    // shows its own "price not current" flag on this pass.
-    blockedHosts = new Set(
-      Object.entries(data.platform_status || {})
-        .filter(([, s]) => s.blocked > 0)
-        .map(([host]) => host)
-    );
+    // This run's confirmed prices become the WHOLE source of truth — not
+    // merged with whatever the last successful check found. A listing
+    // whose price isn't in this payload has no confirmed price right now,
+    // full stop, even if an earlier check had one.
+    livePrices = data.offers || {};
+    const matched = Object.keys(livePrices).length;
 
-    // Prices may have just changed, so recompute which listing(s) are the
-    // best fit for the group before re-rendering, instead of relying on
-    // whatever was true at page load.
+    // Prices may have just changed, so recompute which listing(s) have a
+    // confirmed price, which are the best fit for the group, and which
+    // numbers to use for pins/cards — all before re-rendering.
     computeRecommendations();
 
+    buildMarkers();
     renderList();
-    updateMarkers();
+    updateFilterNote();
+    fitMapToMarkersOnce();
 
     const when = formatLocalTime(data.updated);
     lastUpdatedEl.classList.remove('stale');
-    lastUpdatedEl.innerHTML = `<span class="dot"></span>Prices last refreshed: ${when} (automated check, ${matched} rates loaded)`;
+    lastUpdatedEl.innerHTML = `<span class="dot"></span>Prices last refreshed: ${when} (automated check, ${matched} live rate${matched===1?'':'s'} confirmed)`;
     refreshStatus.textContent = "✓ Loaded the latest automated price check.";
   } catch(err){
-    // No prices.json yet, or this copy was opened without the hosted
-    // link's server — fall back to what's baked into the page itself.
-    blockedHosts = new Set();
+    // No prices.json yet, this copy was opened without the hosted link's
+    // server, or a network hiccup. There's no baked-in snapshot to fall
+    // back to by design, so this says plainly that live prices aren't
+    // available right now rather than showing anything unconfirmed.
+    livePrices = {};
+    computeRecommendations();
+    buildMarkers();
     renderList();
-    updateMarkers();
+    updateFilterNote();
     lastUpdatedEl.classList.add('stale');
-    lastUpdatedEl.innerHTML = `<span class="dot"></span>Showing prices manually verified ${BASELINE_VERIFIED} — live refresh unavailable right now.`;
+    lastUpdatedEl.innerHTML = `<span class="dot"></span>Live prices unavailable right now — nothing confirmed to show yet.`;
     refreshStatus.textContent = isAuto
-      ? "Couldn't reach the automated price feed — showing the saved snapshot instead."
-      : "Still couldn't reach the automated price feed — showing the saved snapshot instead.";
+      ? "Couldn't reach the automated price feed — will try again shortly."
+      : "Still couldn't reach the automated price feed — will try again shortly.";
   }
 
   setTimeout(()=>{ refreshStatus.classList.remove('show'); }, 6000);
 }
 
 // ---- init ----
-buildMarkers();
-renderList();
-
-if(mapAvailable){
-  // Fit map to all markers initially
-  const group = L.featureGroup(Object.values(markers));
-  if(group.getBounds().isValid()) map.fitBounds(group.getBounds().pad(0.2));
-  // Coordinates above are confirmed exact addresses — no live geocoding needed or run.
-}
-
-// Load the latest automated price check as soon as the page opens, then
-// keep checking quietly in the background for as long as the tab stays
-// open — so a page someone leaves open all day still catches up with the
-// GitHub Action's 3-hour refreshes on its own, with nothing to click.
-runPriceCheck(true);
+// No baked-in prices to show while waiting on the first fetch, so the
+// very first render is deferred until runPriceCheck resolves (success or
+// failure) instead of rendering synchronously with an empty livePrices —
+// that would otherwise flash "no results" before the real data arrives.
+runPriceCheck(false);
 setInterval(()=> runPriceCheck(true), AUTO_REFRESH_MS);
 </script>
 
