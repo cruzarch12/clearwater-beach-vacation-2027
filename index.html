@@ -50,12 +50,6 @@
     font-weight:600;
     letter-spacing:-0.01em;
   }
-  header p.sub{
-    margin:.5rem 0 0;
-    color:var(--seafoam);
-    font-size:1.02rem;
-    max-width:640px;
-  }
   .title-row{
     display:flex;
     flex-wrap:wrap;
@@ -90,7 +84,7 @@
   }
   .refresh-status.show{ display:block; }
   .last-updated{
-    margin:.3rem 0 0;
+    margin:.6rem 0 0;
     font-size:.8rem;
     color:var(--seafoam);
   }
@@ -574,7 +568,6 @@
     <div class="title-row">
       <h1>Clearwater Beach, Summer 2027</h1>
     </div>
-    <p class="sub">Every rental option we've found so far, mapped and priced for our two candidate weeks. Tap a pin or a card to see the listing.</p>
     <p class="last-updated" id="lastUpdated"><span class="dot"></span>Checking price freshness…</p>
     <p class="refresh-status" id="refreshStatus" aria-live="polite"></p>
   </div>
@@ -878,6 +871,21 @@ function feetBetween(lat1, lng1, lat2, lng2){
 // latest prices instead of going stale between refreshes.
 let recommendedPair = null;
 
+// The single sort order the whole page agrees on: biggest, most
+// group-friendly listings first (bedrooms, then sleeps as a tiebreak,
+// then name for a stable order when both match). Both the map pin
+// numbers and the list's card numbers are assigned from this exact
+// order, so "card 3" and "pin 3" are always the same property, in the
+// same numerical sequence a person reading top-to-bottom would expect —
+// never the order properties happen to appear in the data above.
+function bySizeThenName(a,b){
+  if(b.beds !== a.beds) return b.beds - a.beds;
+  const sleepsA = a.sleeps != null ? a.sleeps : 0;
+  const sleepsB = b.sleeps != null ? b.sleeps : 0;
+  if(sleepsB !== sleepsA) return sleepsB - sleepsA;
+  return a.name.localeCompare(b.name);
+}
+
 function computeRecommendations(){
   // Reset any tags from a previous computation before recalculating.
   properties.forEach(p=>{
@@ -886,8 +894,12 @@ function computeRecommendations(){
     p.recommendedPairData = null;
   });
 
-  properties.forEach((p,i) => {
-    p.idx = i+1;
+  // Assign each property's number from the shared largest-first order,
+  // so pin numbers on the map and card numbers in the list always match
+  // and always read in sequence.
+  [...properties].sort(bySizeThenName).forEach((p,i)=>{ p.idx = i+1; });
+
+  properties.forEach((p) => {
     p.lat = p.fallback[0];
     p.lng = p.fallback[1];
     p.best = {
@@ -1070,17 +1082,9 @@ function popupHtml(p){
 function renderList(){
   const col = document.getElementById('listCol');
   col.innerHTML = "";
-  // Largest listings first — bedrooms is the primary sort (it's what
-  // actually determines whether the group fits comfortably), sleeps count
-  // breaks ties, so the biggest, most group-friendly options are always
-  // at the top instead of being buried in whatever order they were added.
-  const sorted = [...properties].sort((a,b)=>{
-    if(b.beds !== a.beds) return b.beds - a.beds;
-    const sleepsA = a.sleeps != null ? a.sleeps : 0;
-    const sleepsB = b.sleeps != null ? b.sleeps : 0;
-    if(sleepsB !== sleepsA) return sleepsB - sleepsA;
-    return a.idx - b.idx;
-  });
+  // Same order p.idx was numbered from — keeps the card numbers reading
+  // in sequence (1, 2, 3…) top to bottom, matching the map pins exactly.
+  const sorted = [...properties].sort(bySizeThenName);
   sorted.forEach(p=>{
     const show = matchesFilter(p);
     const card = document.createElement('div');
@@ -1330,12 +1334,33 @@ function applyPriceOverlay(offersByUrl){
 
 function formatLocalTime(isoString){
   try{
-    // timeZoneName:'short' renders the viewer's own local zone abbreviation
-    // (e.g. CDT in Dallas, EDT in Orlando) — whatever the device reports,
-    // never a hardcoded one.
-    return new Date(isoString).toLocaleString(undefined, {
-      dateStyle:'medium', timeStyle:'short', timeZoneName:'short'
-    });
+    const d = new Date(isoString);
+    if(isNaN(d.getTime())) throw new Error('invalid date');
+    // Built from the Date object's own local getters rather than a single
+    // combined Intl call — some browsers (older Safari in particular)
+    // throw on dateStyle+timeStyle+timeZoneName together, which silently
+    // fell back to the raw ISO string instead of a readable date. This
+    // always renders, in the viewer's own local time zone, as
+    // "10-04-2026 8:56PM CDT" (MM-DD-YYYY h:mmAM/PM ZONE).
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    const yyyy = d.getFullYear();
+    let hours = d.getHours();
+    const minutes = String(d.getMinutes()).padStart(2,'0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    if(hours === 0) hours = 12;
+    let tz = '';
+    try{
+      // timeZoneName:'short' renders the viewer's own local zone
+      // abbreviation (e.g. CDT in Dallas, EDT in Orlando) — whatever the
+      // device reports, never a hardcoded one.
+      const part = new Intl.DateTimeFormat(undefined, { timeZoneName:'short' })
+        .formatToParts(d)
+        .find(p => p.type === 'timeZoneName');
+      if(part) tz = part.value;
+    } catch(tzErr){ /* no zone abbreviation available — still show the time */ }
+    return `${mm}-${dd}-${yyyy} ${hours}:${minutes}${ampm}${tz ? ' ' + tz : ''}`;
   } catch(e){
     return isoString;
   }
