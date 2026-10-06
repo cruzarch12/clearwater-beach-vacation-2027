@@ -42,17 +42,16 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r scripts/requirements.txt
 
-      # The Chromium *browser binary* (~150MB) is the one genuinely slow,
-      # skippable part of setup — it doesn't change unless scripts/
-      # requirements.txt (which pins the playwright version) changes, so
-      # it's cached by that same key. The apt-get system libraries pulled
-      # in by --with-deps CAN'T be cached this way (GitHub Actions doesn't
-      # persist installed system packages between runs, only files under
-      # specific cached paths), so that part still runs every time — but
-      # apt itself already skips anything already present on the stock
-      # ubuntu-latest image, which is most of it. That's why the log shows
-      # a lot of "already the newest version" lines: that's apt being
-      # efficient, not the workflow doing redundant work.
+      # What the "Ubuntu" lines in the log are: Chromium needs a handful of
+      # Linux system libraries (fonts, graphics, audio) to run. GitHub gives
+      # every run a brand-new, empty Ubuntu machine, so nothing installed on
+      # a previous run is still there — but the stock image already has most
+      # of those libraries, so the install is often a no-op. This workflow
+      # therefore (1) caches the Chromium *browser file* itself (~150MB,
+      # keyed to requirements.txt, so it's only re-downloaded when the
+      # playwright version changes), and (2) test-launches Chromium and only
+      # runs the system-library install if that launch actually fails —
+      # check first, install only if needed.
       - name: Cache Playwright browser binary
         id: playwright-cache
         uses: actions/cache@v4
@@ -60,13 +59,18 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-chromium-${{ runner.os }}-${{ hashFiles('scripts/requirements.txt') }}
 
-      - name: Install Playwright's Chromium (skips the download on a cache hit)
-        run: playwright install --with-deps chromium
+      - name: Download Chromium (only on a cache miss)
+        run: playwright install chromium
         if: steps.playwright-cache.outputs.cache-hit != 'true'
 
-      - name: Install just the system libraries Chromium needs (cache hit — binary already present)
-        run: playwright install-deps chromium
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
+      - name: Install system libraries only if Chromium can't launch without them
+        run: |
+          if python -c "from playwright.sync_api import sync_playwright as sp; pw = sp().start(); pw.chromium.launch().close(); pw.stop()" 2>/dev/null; then
+            echo "Chromium launches fine — system libraries already present, skipping install."
+          else
+            echo "Chromium couldn't launch — installing the missing system libraries."
+            playwright install-deps chromium
+          fi
 
       - name: Re-check every listing and write data/prices.json
         run: python scripts/scrape_prices.py
