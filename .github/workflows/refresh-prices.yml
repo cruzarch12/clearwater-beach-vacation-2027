@@ -63,16 +63,46 @@ jobs:
         run: playwright install chromium
         if: steps.playwright-cache.outputs.cache-hit != 'true'
 
-      - name: Install system libraries only if Chromium can't launch without them
+      # Camoufox (a hardened Firefox) is used only for the Vrbo/Expedia links.
+      # Its browser file is cached too. The scraper falls back to Chromium if
+      # Camoufox can't start, so a failure here never blocks the other sites.
+      - name: Cache Camoufox browser binary
+        id: camoufox-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/camoufox
+          key: camoufox-${{ runner.os }}-${{ hashFiles('scripts/requirements.txt') }}
+
+      - name: Download Camoufox (only on a cache miss)
+        if: steps.camoufox-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python -m camoufox fetch
+
+      - name: Install system libraries only if a browser can't launch without them
         run: |
           if python -c "from playwright.sync_api import sync_playwright as sp; pw = sp().start(); pw.chromium.launch().close(); pw.stop()" 2>/dev/null; then
-            echo "Chromium launches fine — system libraries already present, skipping install."
+            echo "Chromium launches fine - skipping system library install."
           else
-            echo "Chromium couldn't launch — installing the missing system libraries."
+            echo "Chromium couldn't launch - installing missing system libraries."
             playwright install-deps chromium
+          fi
+          # Firefox (Camoufox) needs a few extra libs; check separately.
+          if python -c "from camoufox.sync_api import Camoufox; b = Camoufox(headless=True).__enter__(); b.new_page(); b.close()" 2>/dev/null; then
+            echo "Camoufox launches fine."
+          else
+            echo "Camoufox didn't launch - installing Firefox system libraries (scraper will fall back to Chromium if it still can't run)."
+            playwright install-deps firefox || true
           fi
 
       - name: Re-check every listing and write data/prices.json
+        env:
+          # Optional paid residential proxy, used only for Vrbo/Expedia.
+          # Leave the secrets unset to run without one.
+          PROXY_SERVER: ${{ secrets.PROXY_SERVER }}
+          PROXY_USERNAME: ${{ secrets.PROXY_USERNAME }}
+          PROXY_PASSWORD: ${{ secrets.PROXY_PASSWORD }}
         run: python scripts/scrape_prices.py
 
       - name: Commit updated prices, if anything changed
