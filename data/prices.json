@@ -87,12 +87,12 @@
       "unavailable": 0
     },
     "www.whimstay.com": {
-      "blocked": 4,
+      "blocked": 0,
       "checked": 4,
       "ok": 0,
-      "other_failed": 0,
+      "other_failed": 4,
       "unavailable": 0
     }
   },
-  "updated": "2026-10-07T21:10:43Z"
+  "updated": "2026-10-08T00:10:44Z"
 }
