@@ -71,11 +71,11 @@
       "unavailable": 0
     },
     "www.booking.com": {
-      "blocked": 0,
+      "blocked": 1,
       "checked": 2,
       "ok": 0,
       "other_failed": 0,
-      "unavailable": 2
+      "unavailable": 1
     },
     "www.expedia.com": {
       "blocked": 0,
@@ -99,5 +99,5 @@
       "unavailable": 0
     }
   },
-  "updated": "2026-10-10T20:45:54Z"
+  "updated": "2026-10-10T21:08:10Z"
 }
