@@ -63,8 +63,8 @@ PRICES_JSON = ROOT / "data" / "prices.json"
 # sites render the price box client-side, so grabbing text too early comes
 # back empty. Platforms known to be slower / more defensive get a longer
 # settle time and one retry below.
-SETTLE_MS = 3500
-SETTLE_MS_SLOW = 7000
+SETTLE_MS = 6000
+SETTLE_MS_SLOW = 12000
 # The settle times above are now only a *ceiling*: the page text is checked
 # every POLL_MS and reading stops as soon as a stable price (or an
 # "unavailable" message) shows up, so most pages finish in 1-3 seconds
@@ -75,7 +75,7 @@ MIN_WAIT_MS = 1000
 # Parallelism: how many pages in flight overall, and per website. The
 # per-site cap is what matters for avoiding bot flags (they look at repeated
 # hits from one IP to one site); different sites can run side by side.
-MAX_CONCURRENT = 6
+MAX_CONCURRENT = 4
 MAX_PER_HOST = 2
 
 SLOW_HOSTS = ("vrbo.com", "booking.com", "guestybookings.com", "expedia.com", "hospitable.com", "clearwaterbeachvacationhomes.com")
@@ -363,7 +363,7 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
             # slow-rendering price widget (heavy pages like listings with
             # 90+ photos) can look like a block or a missing price on the
             # first pass.
-            text = await attempt(SETTLE_MS_SLOW + 3000)
+            text = await attempt(SETTLE_MS_SLOW + 6000)
             if looks_unavailable(text) or date_mismatch(url, text):
                 statuses[url] = "unavailable"
                 unavailable.append(url)
@@ -377,10 +377,13 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
             blocked.append(url)
             statuses[url] = "blocked"
         else:
-            hint = re.search(r".{0,40}\\d+\\s*nights?.{0,40}", text)
+            hint = re.search(r".{0,40}\d+\s*nights?.{0,40}", text)
+            dollars = [m.group(0).replace("\n", " ") for m in re.finditer(r".{0,30}\$[\d,]+.{0,20}", text)][:4]
+            head = text.strip()[:120].replace("\n", " ") if len(text) < 1500 else None
             errors.append(
                 f"no price match ({len(text)} chars of page text; "
-                f"nights text: {(hint.group(0).strip() if hint else None)!r}): {url}"
+                f"nights text: {(hint.group(0).strip() if hint else None)!r}; "
+                f"$ amounts seen: {dollars}; short-page text: {head!r}): {url}"
             )
             statuses[url] = "no_match"
     except Exception as exc:  # noqa: BLE001 - log and move on, never crash the run
