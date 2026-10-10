@@ -66,7 +66,7 @@ PRICES_JSON = ROOT / "data" / "prices.json"
 SETTLE_MS = 3500
 SETTLE_MS_SLOW = 7000
 
-SLOW_HOSTS = ("vrbo.com", "booking.com", "guestybookings.com", "expedia.com", "clearwaterbeachvacationhomes.com")
+SLOW_HOSTS = ("vrbo.com", "booking.com", "guestybookings.com", "expedia.com", "hospitable.com", "clearwaterbeachvacationhomes.com")
 
 # One combined dollar-amount pattern, used differently per platform below.
 MONEY = r"\$[\d,]+(?:\.\d{2})?"
@@ -225,6 +225,18 @@ def parse_price(url: str, page_text: str):
         # direct stay price; the Vrbo/Airbnb "from $X" comparison rates
         # beside it are deliberately ignored.
         m = re.search(r"Book Direct:?\s*(" + MONEY + r")", page_text, re.I)
+        return _to_float(m.group(1)) if m else None
+
+    if "hospitable.com" in host:
+        # Booking-request page: "$1,596.60 x 5 nights ... Total $9,782.28".
+        # The dates are preselected by the link and aren't in the text, so
+        # the "x N nights" line must match the nights this link was made for.
+        # No price block (dates unbookable) -> None.
+        want = expected_nights(url) or 5   # both trip weeks are 5 nights
+        nm = re.search(r"x\s*(\d+)\s*nights?", page_text)
+        if want and (not nm or int(nm.group(1)) != want):
+            return None
+        m = re.search(r"Total\s*(" + MONEY + r")", page_text)
         return _to_float(m.group(1)) if m else None
 
     if "guestybookings.com" in host:
