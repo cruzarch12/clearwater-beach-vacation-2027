@@ -82,12 +82,15 @@ jobs:
 
       - name: Install system libraries only if a browser can't launch without them
         run: |
+          T0=$(date +%s)
           if python -c "from playwright.sync_api import sync_playwright as sp; pw = sp().start(); pw.chromium.launch().close(); pw.stop()" 2>/dev/null; then
             echo "Chromium launches fine - skipping system library install."
           else
             echo "Chromium couldn't launch - installing missing system libraries."
             playwright install-deps chromium
           fi
+          echo "Chromium check took $(( $(date +%s) - T0 ))s"
+          T1=$(date +%s)
           # Firefox (Camoufox) needs a few extra libs; check separately.
           if python -c "from camoufox.sync_api import Camoufox; b = Camoufox(headless=True).__enter__(); b.new_page(); b.close()" 2>/dev/null; then
             echo "Camoufox launches fine."
@@ -95,6 +98,7 @@ jobs:
             echo "Camoufox didn't launch - installing Firefox system libraries (scraper will fall back to Chromium if it still can't run)."
             playwright install-deps firefox || true
           fi
+          echo "Camoufox check/install took $(( $(date +%s) - T1 ))s"
 
       - name: Re-check every listing and write data/prices.json
         env:
