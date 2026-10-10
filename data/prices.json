@@ -1,5 +1,7 @@
 {
   "offers": {
+    "https://booking.hospitable.com/book/18133430/2147480/0d9e51e8-a3ce-424b-9dd1-7a9fa29129c8": 9782.28,
+    "https://booking.hospitable.com/book/18133430/2147480/ee9c6f73-827f-43fc-a970-dc4458dcc730": 11651.04,
     "https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-05-31&co=2027-06-05": 7354.22,
     "https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-06-07&co=2027-06-12": 8661.15,
     "https://sunnyorangestays.com/properties/island-time/?ci=2027-05-31&co=2027-06-05": 9957.81,
@@ -26,6 +28,13 @@
     "https://www.airbnb.com/rooms/52600497?adults=8&check_in=2027-06-07&check_out=2027-06-12&guests=6&search_mode=regular_search&amenities%5B%5D=7&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=34&amenities%5B%5D=33&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=1811854569&source_impression_id=p3_1791146587_P3M90CuHyOOqqSeW&previous_page_section_name=1001&federated_search_id=dd43953a-b874-4b25-855e-7aa2b3f32204": 4848.0
   },
   "platform_status": {
+    "booking.hospitable.com": {
+      "blocked": 0,
+      "checked": 2,
+      "ok": 2,
+      "other_failed": 0,
+      "unavailable": 0
+    },
     "booking.thegemmacwb.com": {
       "blocked": 0,
       "checked": 4,
@@ -90,5 +99,5 @@
       "unavailable": 0
     }
   },
-  "updated": "2026-10-10T18:07:57Z"
+  "updated": "2026-10-10T20:45:54Z"
 }
