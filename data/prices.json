@@ -2,6 +2,10 @@
   "offers": {
     "https://booking.hospitable.com/book/18133430/2147480/0d9e51e8-a3ce-424b-9dd1-7a9fa29129c8": 9782.28,
     "https://booking.hospitable.com/book/18133430/2147480/ee9c6f73-827f-43fc-a970-dc4458dcc730": 11651.04,
+    "https://booking.thegemmacwb.com/en/properties/6557b587d20bd0005a4b1a2e?minOccupancy=14&checkIn=2027-05-31&checkOut=2027-06-05&adults=14": 12832.28,
+    "https://booking.thegemmacwb.com/en/properties/6557b587d20bd0005a4b1a2e?minOccupancy=14&checkIn=2027-06-07&checkOut=2027-06-12&adults=14": 12938.5,
+    "https://booking.thegemmacwb.com/en/properties/6557b6747c64d0003c7e532e?minOccupancy=14&checkIn=2027-05-31&checkOut=2027-06-05&adults=14": 12819.85,
+    "https://booking.thegemmacwb.com/en/properties/6557b6747c64d0003c7e532e?minOccupancy=14&checkIn=2027-06-07&checkOut=2027-06-12&adults=14": 13009.69,
     "https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-05-31&co=2027-06-05": 7354.22,
     "https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-06-07&co=2027-06-12": 8661.15,
     "https://sunnyorangestays.com/properties/island-time/?ci=2027-05-31&co=2027-06-05": 9957.81,
@@ -40,8 +44,8 @@
     "booking.thegemmacwb.com": {
       "blocked": 0,
       "checked": 4,
-      "ok": 0,
-      "other_failed": 4,
+      "ok": 4,
+      "other_failed": 0,
       "unavailable": 0
     },
     "clearwaterbeachrentals.guestybookings.com": {
@@ -87,19 +91,19 @@
       "unavailable": 0
     },
     "www.vrbo.com": {
-      "blocked": 2,
+      "blocked": 7,
       "checked": 11,
-      "ok": 0,
-      "other_failed": 9,
-      "unavailable": 0
-    },
-    "www.whimstay.com": {
-      "blocked": 0,
-      "checked": 4,
       "ok": 0,
       "other_failed": 4,
       "unavailable": 0
+    },
+    "www.whimstay.com": {
+      "blocked": 4,
+      "checked": 4,
+      "ok": 0,
+      "other_failed": 0,
+      "unavailable": 0
     }
   },
-  "updated": "2026-10-10T22:17:36Z"
+  "updated": "2026-10-10T22:30:14Z"
 }
