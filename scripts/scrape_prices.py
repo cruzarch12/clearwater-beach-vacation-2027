@@ -65,6 +65,18 @@ PRICES_JSON = ROOT / "data" / "prices.json"
 # settle time and one retry below.
 SETTLE_MS = 3500
 SETTLE_MS_SLOW = 7000
+# The settle times above are now only a *ceiling*: the page text is checked
+# every POLL_MS and reading stops as soon as a stable price (or an
+# "unavailable" message) shows up, so most pages finish in 1-3 seconds
+# instead of always sitting out the full wait.
+POLL_MS = 500
+MIN_WAIT_MS = 1000
+
+# Parallelism: how many pages in flight overall, and per website. The
+# per-site cap is what matters for avoiding bot flags (they look at repeated
+# hits from one IP to one site); different sites can run side by side.
+MAX_CONCURRENT = 6
+MAX_PER_HOST = 2
 
 SLOW_HOSTS = ("vrbo.com", "booking.com", "guestybookings.com", "expedia.com", "hospitable.com", "clearwaterbeachvacationhomes.com")
 
@@ -274,30 +286,6 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
     is_slow_host = any(h in host for h in SLOW_HOSTS)
     settle = SETTLE_MS_SLOW if is_slow_host else SETTLE_MS
 
-    async def attempt(settle_ms):
-        page = await context.new_page()
-        try:
-            await page.goto(url, wait_until="domcontentloaded", timeout=45000)
-            await page.wait_for_timeout(settle_ms)
-            # Nudge lazy-rendered price widgets into view.
-            try:
-                await page.mouse.wheel(0, 1200)
-                await page.wait_for_timeout(600)
-            except Exception:
-                pass
-            text = await page.inner_text("body")
-            if "clearwaterbeachvacationhomes.com" in host:
-                # Prices render inside embedded widget iframes, which
-                # inner_text("body") on the main page doesn't include.
-                for fr in page.frames[1:]:
-                    try:
-                        text += "\n" + await fr.inner_text("body")
-                    except Exception:
-                        pass
-            return text
-        finally:
-            await page.close()
-
     def date_mismatch(u, t):
         # A price was quoted, but only for a different number of nights than
         # the URL's dates span — the site swapped in other dates.
@@ -306,6 +294,56 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
             price, mismatch = _nights_price(t, u)
             return price is None and mismatch
         return False
+
+    async def read_text(page):
+        text = await page.inner_text("body")
+        if "clearwaterbeachvacationhomes.com" in host:
+            # Prices render inside embedded widget iframes, which
+            # inner_text("body") on the main page doesn't include.
+            for fr in page.frames[1:]:
+                try:
+                    text += "\n" + await fr.inner_text("body")
+                except Exception:
+                    pass
+        return text
+
+    async def attempt(max_wait_ms):
+        """Load the page, then poll its text until a price (seen on two
+        consecutive polls, so a half-rendered widget can't fool it) or an
+        'unavailable' message appears, or max_wait_ms runs out."""
+        page = await context.new_page()
+        try:
+            await page.goto(url, wait_until="domcontentloaded", timeout=45000)
+            await page.wait_for_timeout(MIN_WAIT_MS)
+            waited = MIN_WAIT_MS
+            nudged = False
+            last_price = None
+            text = ""
+            while True:
+                if not nudged:
+                    # Nudge lazy-rendered price widgets into view (once).
+                    nudged = True
+                    try:
+                        await page.mouse.wheel(0, 1200)
+                    except Exception:
+                        pass
+                try:
+                    text = await read_text(page)
+                except Exception:
+                    text = ""
+                if text:
+                    if looks_unavailable(text) or date_mismatch(url, text):
+                        return text
+                    price_now = parse_price(url, text)
+                    if price_now is not None and price_now == last_price:
+                        return text
+                    last_price = price_now
+                if waited >= max_wait_ms:
+                    return text
+                await page.wait_for_timeout(POLL_MS)
+                waited += POLL_MS
+        finally:
+            await page.close()
 
     try:
         text = await attempt(settle)
@@ -316,7 +354,11 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
             unavailable.append(url)
             return
         price = parse_price(url, text)
-        if price is None:
+        if price is None and any(sign in text.lower() for sign in BLOCK_SIGNS):
+            # A bot-check page won't turn into a price by waiting longer;
+            # skip the retry (saves ~10s per blocked link).
+            pass
+        elif price is None:
             # One retry with a longer settle time before giving up — a
             # slow-rendering price widget (heavy pages like listings with
             # 90+ photos) can look like a block or a missing price on the
@@ -438,12 +480,15 @@ async def main():
                 await Stealth().apply_stealth_async(hard_target)
                 print("Vrbo/Expedia: standard browser via proxy.")
 
-        # Small concurrency cap — hammering these sites in parallel is what
-        # gets an IP flagged fastest.
-        sem = asyncio.Semaphore(3)
+        # Concurrency: a global cap plus a per-site cap, so different
+        # sites are checked side by side but no single site sees more than
+        # MAX_PER_HOST simultaneous visits from this IP.
+        sem = asyncio.Semaphore(MAX_CONCURRENT)
+        host_sems: dict = {}
 
         async def bound_check(u):
-            async with sem:
+            hs = host_sems.setdefault(host_of(u), asyncio.Semaphore(MAX_PER_HOST))
+            async with hs, sem:
                 target = hard_target if is_hard_host(u) else context
                 await check_one(target, u, results, errors, blocked, statuses, unavailable)
 
