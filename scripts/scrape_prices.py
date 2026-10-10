@@ -77,6 +77,7 @@ MIN_WAIT_MS = 1000
 # hits from one IP to one site); different sites can run side by side.
 MAX_CONCURRENT = 4
 MAX_PER_HOST = 2
+BREAKER_AFTER = 3
 
 SLOW_HOSTS = ("vrbo.com", "booking.com", "guestybookings.com", "expedia.com", "hospitable.com", "clearwaterbeachvacationhomes.com")
 
@@ -104,6 +105,8 @@ BLOCK_SIGNS = (
     "checking your browser",
     "ddos protection by",
     "attention required",
+    "confirm you are human",
+    "verifies that you are not a bot",
 )
 
 
@@ -251,7 +254,7 @@ def parse_price(url: str, page_text: str):
         m = re.search(r"Total\s*(" + MONEY + r")", page_text)
         return _to_float(m.group(1)) if m else None
 
-    if "guestybookings.com" in host:
+    if "guestybookings.com" in host or "thegemmacwb.com" in host:
         # Booking-summary panel ends with "Total  $11,157.62"
         m = re.search(r"Total\s*" + MONEY, page_text)
         return _to_float(m.group(0)) if m else None
@@ -317,6 +320,7 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
             await page.wait_for_timeout(MIN_WAIT_MS)
             waited = MIN_WAIT_MS
             nudged = False
+            clicked = False
             last_price = None
             text = ""
             while True:
@@ -340,6 +344,15 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
                     last_price = price_now
                 if waited >= max_wait_ms:
                     return text
+                if "guestybookings.com" in host and not clicked and waited >= 2500:
+                    # These pages show "Search for available dates" with the
+                    # dates already filled in; the quote only appears once
+                    # that Search button is pressed (read-only action).
+                    clicked = True
+                    try:
+                        await page.get_by_role("button", name="Search", exact=True).first.click(timeout=2000)
+                    except Exception:
+                        pass
                 await page.wait_for_timeout(POLL_MS)
                 waited += POLL_MS
         finally:
@@ -489,11 +502,28 @@ async def main():
         sem = asyncio.Semaphore(MAX_CONCURRENT)
         host_sems: dict = {}
 
+        # Circuit breaker for the heavily defended sites: if the first
+        # BREAKER_AFTER links to a site all come back without a price, the
+        # rest of that site's links are skipped for this run instead of
+        # spending ~30s each on pages that won't give a price.
+        fails: dict = {}
+
         async def bound_check(u):
-            hs = host_sems.setdefault(host_of(u), asyncio.Semaphore(MAX_PER_HOST))
+            h = host_of(u)
+            hs = host_sems.setdefault(h, asyncio.Semaphore(MAX_PER_HOST))
             async with hs, sem:
-                target = hard_target if is_hard_host(u) else context
+                hard = is_hard_host(u)
+                if hard and fails.get(h, 0) >= BREAKER_AFTER:
+                    statuses[u] = "blocked"
+                    blocked.append(u)
+                    return
+                target = hard_target if hard else context
                 await check_one(target, u, results, errors, blocked, statuses, unavailable)
+                if hard:
+                    if statuses.get(u) == "ok":
+                        fails[h] = -10**6      # a success disables the breaker
+                    else:
+                        fails[h] = fails.get(h, 0) + 1
 
         try:
             await asyncio.gather(*(bound_check(u) for u in urls))
