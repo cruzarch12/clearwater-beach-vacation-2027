@@ -29,9 +29,7 @@
     "https://www.airbnb.com/rooms/49227396?check_in=2027-05-31&check_out=2027-06-05": 9576.0,
     "https://www.airbnb.com/rooms/49227396?check_in=2027-06-07&check_out=2027-06-12": 11419.0,
     "https://www.airbnb.com/rooms/52600497?adults=8&check_in=2027-05-31&check_out=2027-06-05&guests=6&search_mode=regular_search&amenities%5B%5D=7&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=34&amenities%5B%5D=33&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=1811854569&source_impression_id=p3_1791146713_P3nq4q3Es8e8wfRC&previous_page_section_name=1001&federated_search_id=5312b0c6-4312-4e81-b984-76e8a64dc1a0": 4575.0,
-    "https://www.airbnb.com/rooms/52600497?adults=8&check_in=2027-06-07&check_out=2027-06-12&guests=6&search_mode=regular_search&amenities%5B%5D=7&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=34&amenities%5B%5D=33&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=1811854569&source_impression_id=p3_1791146587_P3M90CuHyOOqqSeW&previous_page_section_name=1001&federated_search_id=dd43953a-b874-4b25-855e-7aa2b3f32204": 4848.0,
-    "https://www.expedia.com/St-Petersburg-Clearwater-Hotels-LARGEST-In-North-Beach-PRIVATE-POOL-1-Block-To-BEACH-All-3-Units-SLEEPS-16.h66895252.Hotel-Information?chkin=2027-05-31&chkout=2027-06-05&x_pwa=1&rfrr=HSR&pwa_ts=1791248324442&referrerUrl=aHR0cHM6Ly93d3cuZXhwZWRpYS5jb20vSG90ZWwtU2VhcmNo&useRewards=false&rm1=a16&regionId=10759&destination=Clearwater+Beach%2C+Florida%2C+United+States+of+America&destType=MARKET&selected=66895252&latLong=27.977474%2C-82.827931&sort=RECOMMENDED&top_dp=10940&top_cur=USD&userIntent=&selectedRoomType=66895252&selectedRatePlan=0004c14c3f1edfa54af9a38ee7eb1fcc2235&categorySearch=any_option&searchId=81b2f7db-000d-49a5-94f7-51cffbe643f1&containsVideo=false": 10945.0,
-    "https://www.expedia.com/St-Petersburg-Clearwater-Hotels-LARGEST-In-North-Beach-PRIVATE-POOL-1-Block-To-BEACH-All-3-Units-SLEEPS-16.h66895252.Hotel-Information?chkin=2027-06-07&chkout=2027-06-12&x_pwa=1&rfrr=HSR&pwa_ts=1791248324442&referrerUrl=aHR0cHM6Ly93d3cuZXhwZWRpYS5jb20vSG90ZWwtU2VhcmNo&useRewards=false&rm1=a16&regionId=10759&destination=Clearwater+Beach%2C+Florida%2C+United+States+of+America&destType=MARKET&selected=66895252&latLong=27.977474%2C-82.827931&sort=RECOMMENDED&top_dp=10940&top_cur=USD&userIntent=&selectedRoomType=66895252&selectedRatePlan=0004c14c3f1edfa54af9a38ee7eb1fcc2235&categorySearch=any_option&searchId=8b272713-ea89-4972-abba-5b3bbee9b317&containsVideo=false&startDate=2027-06-07&endDate=2027-06-12": 13025.0
+    "https://www.airbnb.com/rooms/52600497?adults=8&check_in=2027-06-07&check_out=2027-06-12&guests=6&search_mode=regular_search&amenities%5B%5D=7&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=34&amenities%5B%5D=33&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=1811854569&source_impression_id=p3_1791146587_P3M90CuHyOOqqSeW&previous_page_section_name=1001&federated_search_id=dd43953a-b874-4b25-855e-7aa2b3f32204": 4848.0
   },
   "platform_status": {
     "booking.hospitable.com": {
@@ -84,17 +82,17 @@
       "unavailable": 2
     },
     "www.expedia.com": {
-      "blocked": 0,
+      "blocked": 1,
       "checked": 2,
-      "ok": 2,
-      "other_failed": 0,
+      "ok": 0,
+      "other_failed": 1,
       "unavailable": 0
     },
     "www.vrbo.com": {
-      "blocked": 7,
+      "blocked": 9,
       "checked": 11,
       "ok": 0,
-      "other_failed": 4,
+      "other_failed": 2,
       "unavailable": 0
     },
     "www.whimstay.com": {
@@ -105,5 +103,5 @@
       "unavailable": 0
     }
   },
-  "updated": "2026-10-11T00:09:48Z"
+  "updated": "2026-10-11T00:18:50Z"
 }
