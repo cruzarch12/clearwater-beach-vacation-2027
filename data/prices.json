@@ -50,8 +50,8 @@
       "blocked": 0,
       "checked": 2,
       "ok": 0,
-      "other_failed": 2,
-      "unavailable": 0
+      "other_failed": 0,
+      "unavailable": 2
     },
     "clearwaterbeachvacationhomes.com": {
       "blocked": 2,
@@ -103,5 +103,5 @@
       "unavailable": 0
     }
   },
-  "updated": "2026-10-11T01:37:17Z"
+  "updated": "2026-10-11T01:50:20Z"
 }
