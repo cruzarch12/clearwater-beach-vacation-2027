@@ -80,11 +80,11 @@ MAX_CONCURRENT = 6
 MAX_PER_HOST = 2
 BREAKER_AFTER = 2
 # Sites that have never blocked us get a slightly higher per-site cap.
-HOST_CAP_OVERRIDE = {"www.airbnb.com": 3, "www.vrbo.com": 1}
+HOST_CAP_OVERRIDE = {"www.airbnb.com": 3, "www.vrbo.com": 1, "www.whimstay.com": 1}
 # Vrbo gets exactly one try per run: its links run one at a time, and if the
 # first comes back without a price the rest are skipped (it has never given
 # a price from GitHub's servers; any success re-enables the rest).
-BREAKER_AFTER_HOST = {"www.vrbo.com": 1}
+BREAKER_AFTER_HOST = {"www.vrbo.com": 1, "www.whimstay.com": 1}
 # Debug screenshots of pages that gave no price on the defended sites /
 # Guesty, saved to ./debug/ and uploaded by the workflow as a downloadable
 # artifact (never committed) so the real page can be inspected.
@@ -96,6 +96,8 @@ _shots = []
 _net_diag: dict = {}
 # Vrbo's quote can take well over 10s to appear on a shared server.
 VRBO_WAIT_MS = 30000
+EXPEDIA_WAIT_MS = 12000   # let the "human check" page self-clear
+EXPEDIA_BLOCK_GRACE_MS = 10000
 
 SLOW_HOSTS = ("vrbo.com", "booking.com", "guestybookings.com", "expedia.com", "hospitable.com", "clearwaterbeachvacationhomes.com")
 
@@ -313,6 +315,8 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
     settle = SETTLE_MS_SLOW if is_slow_host else SETTLE_MS
     if "vrbo.com" in host:
         settle = VRBO_WAIT_MS
+    elif "expedia.com" in host:
+        settle = EXPEDIA_WAIT_MS
     elif "guestybookings.com" in host:
         settle = 8000
 
@@ -408,7 +412,7 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
                             block_polls += 1
                             # A real bot-check page rarely clears itself; after a
                             # few seconds of seeing it, stop waiting.
-                            if block_polls >= 4 and waited >= 4000:
+                            if block_polls >= 4 and waited >= (EXPEDIA_BLOCK_GRACE_MS if "expedia.com" in host else 4000):
                                 await snap(page)
                                 return text
                         else:
@@ -497,6 +501,14 @@ HARD_HOSTS = ("vrbo.com", "expedia.com")
 
 def is_hard_host(url: str) -> bool:
     return any(h in host_of(url) for h in HARD_HOSTS)
+
+
+# Hosts that get the one-try circuit breaker (Whimstay uses plain Chromium).
+BREAKER_HOSTS = HARD_HOSTS + ("whimstay.com",)
+
+
+def is_breaker_host(url: str) -> bool:
+    return any(h in host_of(url) for h in BREAKER_HOSTS)
 
 
 def proxy_from_env():
@@ -598,14 +610,15 @@ async def main():
             async with hs, sem:
                 t_start = time.monotonic()
                 hard = is_hard_host(u)
-                if hard and fails.get(h, 0) >= BREAKER_AFTER_HOST.get(h, BREAKER_AFTER):
+                brk = is_breaker_host(u)
+                if brk and fails.get(h, 0) >= BREAKER_AFTER_HOST.get(h, BREAKER_AFTER):
                     statuses[u] = "blocked"
                     blocked.append(u)
                     return
                 target = hard_target if hard else context
                 await check_one(target, u, results, errors, blocked, statuses, unavailable)
                 timings[u] = time.monotonic() - t_start
-                if hard:
+                if brk:
                     if statuses.get(u) == "ok":
                         fails[h] = -10**6      # a success disables the breaker
                     else:
