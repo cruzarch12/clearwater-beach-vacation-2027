@@ -80,7 +80,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: python -m camoufox fetch
 
-      - name: Install system libraries only if a browser can't launch without them
+      - name: Install system libraries only if Chromium can't launch without them
         run: |
           T0=$(date +%s)
           if python -c "from playwright.sync_api import sync_playwright as sp; pw = sp().start(); pw.chromium.launch().close(); pw.stop()" 2>/dev/null; then
@@ -90,15 +90,9 @@ jobs:
             playwright install-deps chromium
           fi
           echo "Chromium check took $(( $(date +%s) - T0 ))s"
-          T1=$(date +%s)
-          # Firefox (Camoufox) needs a few extra libs; check separately.
-          if python -c "from camoufox.sync_api import Camoufox; b = Camoufox(headless=True).__enter__(); b.new_page(); b.close()" 2>/dev/null; then
-            echo "Camoufox launches fine."
-          else
-            echo "Camoufox didn't launch - installing Firefox system libraries (scraper will fall back to Chromium if it still can't run)."
-            playwright install-deps firefox || true
-          fi
-          echo "Camoufox check/install took $(( $(date +%s) - T1 ))s"
+          # Camoufox isn't test-launched here any more: the scraper already
+          # falls back to Chromium on its own if Camoufox can't start, and
+          # the check cost ~5s every run.
 
       - name: Re-check every listing and write data/prices.json
         env:
@@ -108,6 +102,15 @@ jobs:
           PROXY_USERNAME: ${{ secrets.PROXY_USERNAME }}
           PROXY_PASSWORD: ${{ secrets.PROXY_PASSWORD }}
         run: python scripts/scrape_prices.py
+
+      - name: Keep debug screenshots of pages that returned no price
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-screenshots
+          path: debug/
+          retention-days: 3
+          if-no-files-found: ignore
 
       - name: Commit updated prices, if anything changed
         run: |
