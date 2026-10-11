@@ -122,6 +122,8 @@ BLOCK_SIGNS = (
     "confirm you are human",
     "show us your human side",
     "human or a bot",
+    "403 - forbidden",
+    "access to this page is forbidden",
     "rate limited (http 429)",
     "verifies that you are not a bot",
 )
@@ -307,6 +309,8 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
     settle = SETTLE_MS_SLOW if is_slow_host else SETTLE_MS
     if "vrbo.com" in host:
         settle = VRBO_WAIT_MS
+    elif "guestybookings.com" in host:
+        settle = 8000
 
     def date_mismatch(u, t):
         # A price was quoted, but only for a different number of nights than
@@ -337,6 +341,9 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
             out = ROOT / "debug"
             out.mkdir(exist_ok=True)
             name = re.sub(r"[^A-Za-z0-9]+", "_", host + "_" + url[-40:])[:70] + ".png"
+            if "guestybookings.com" in host:
+                await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                await page.wait_for_timeout(500)
             await page.screenshot(path=str(out / name), full_page=False)
             _shots.append(name)
         except Exception:
@@ -434,8 +441,8 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
             # A bot-check page won't turn into a price by waiting longer;
             # skip the retry (saves ~10s per blocked link).
             pass
-        elif price is None and is_hard_host(url):
-            pass   # defended sites: a longer wait hasn't helped; don't double the cost
+        elif price is None and (is_hard_host(url) or "guestybookings.com" in host):
+            pass   # defended sites / Guesty (no price after the Search click): a longer wait hasn't helped; don't double the cost
         elif price is None:
             # One retry with a longer settle time before giving up — a
             # slow-rendering price widget (heavy pages like listings with
