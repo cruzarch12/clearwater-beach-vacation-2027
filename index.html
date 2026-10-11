@@ -862,6 +862,14 @@ const properties = [
     } }
 ];
 
+// Only these two listings are shown for now; every other entry above is
+// kept in the data but dropped before anything is priced, listed or mapped.
+// Remove this block (or add names) to bring the others back.
+const SHOW_ONLY = ["North Beach Triplex", "Summer Breeze"];
+for (let i = properties.length - 1; i >= 0; i--) {
+  if (!SHOW_ONLY.includes(properties[i].name)) properties.splice(i, 1);
+}
+
 // Listing thumbnails (cropped from the photos provided), keyed by property
 // name. A listing with no entry here simply shows no photo in its popup.
 const PHOTOS = {
@@ -1581,7 +1589,7 @@ function fitMapToMarkersOnce(){
   if(!mapAvailable || hasFitBoundsOnce) return;
   const group = L.featureGroup(Object.values(markers));
   if(!group.getBounds().isValid()) return; // no priced listings yet — nothing to fit to
-  map.fitBounds(group.getBounds().pad(0.2));
+  map.fitBounds(group.getBounds().pad(0.15), { maxZoom:17 });
   hasFitBoundsOnce = true;
   // Coordinates above are confirmed exact addresses — no live geocoding needed or run.
 }
