@@ -86,6 +86,12 @@ HOST_CAP_OVERRIDE = {"www.airbnb.com": 3}
 # artifact (never committed) so the real page can be inspected.
 MAX_SHOTS = 4
 _shots = []
+# Responses to price/availability-type requests on Vrbo/Expedia pages, for
+# the run log: shows whether the price request was refused (403/429),
+# came back empty, or never happened.
+_net_diag: dict = {}
+# Vrbo's quote can take well over 10s to appear on a shared server.
+VRBO_WAIT_MS = 30000
 
 SLOW_HOSTS = ("vrbo.com", "booking.com", "guestybookings.com", "expedia.com", "hospitable.com", "clearwaterbeachvacationhomes.com")
 
@@ -296,6 +302,8 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
     host = host_of(url)
     is_slow_host = any(h in host for h in SLOW_HOSTS)
     settle = SETTLE_MS_SLOW if is_slow_host else SETTLE_MS
+    if "vrbo.com" in host:
+        settle = VRBO_WAIT_MS
 
     def date_mismatch(u, t):
         # A price was quoted, but only for a different number of nights than
@@ -335,6 +343,13 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
         consecutive polls, so a half-rendered widget can't fool it) or an
         'unavailable' message appears, or max_wait_ms runs out."""
         page = await context.new_page()
+        net = []
+        if is_hard_host(url):
+            def _on_resp(r):
+                u_low = r.url.lower()
+                if len(net) < 15 and any(k in u_low for k in ("graphql", "price", "quote", "availab", "/api/")):
+                    net.append(f"{r.status} {r.url[:110]}")
+            page.on("response", _on_resp)
         try:
             await page.goto(url, wait_until="domcontentloaded", timeout=45000)
             await page.wait_for_timeout(MIN_WAIT_MS)
@@ -388,6 +403,8 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
                 await page.wait_for_timeout(POLL_MS)
                 waited += POLL_MS
         finally:
+            if net:
+                _net_diag[url] = list(net)
             await page.close()
 
     try:
@@ -622,6 +639,12 @@ async def main():
     print(f"Scrape wall time {time.monotonic() - t_run:.0f}s. Seconds spent per site (summed across links, run partly in parallel):")
     for h, sec in sorted(per_host_time.items(), key=lambda kv: -kv[1]):
         print(f"  - {h}: {sec:.0f}s")
+    if _net_diag:
+        print("\nPrice/availability requests seen on Vrbo/Expedia pages (status, url):")
+        for u, lines in list(_net_diag.items())[:4]:
+            print(f"  {u[:80]}")
+            for ln in lines:
+                print(f"      {ln}")
     if blocked:
         print("\nBlocked (bot-check/CAPTCHA page returned instead of listing):", file=sys.stderr)
         for u in blocked:
