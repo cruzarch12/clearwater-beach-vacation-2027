@@ -6,12 +6,12 @@
     "https://booking.thegemmacwb.com/en/properties/6557b587d20bd0005a4b1a2e?minOccupancy=14&checkIn=2027-06-07&checkOut=2027-06-12&adults=14": 12938.5,
     "https://booking.thegemmacwb.com/en/properties/6557b6747c64d0003c7e532e?minOccupancy=14&checkIn=2027-05-31&checkOut=2027-06-05&adults=14": 12819.85,
     "https://booking.thegemmacwb.com/en/properties/6557b6747c64d0003c7e532e?minOccupancy=14&checkIn=2027-06-07&checkOut=2027-06-12&adults=14": 13009.69,
-    "https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-05-31&co=2027-06-05": 7354.22,
-    "https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-06-07&co=2027-06-12": 8661.15,
+    "https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-05-31&co=2027-06-05": 7348.12,
+    "https://sunnyorangestays.com/properties/casa-del-mar/?ci=2027-06-07&co=2027-06-12": 8413.66,
     "https://sunnyorangestays.com/properties/island-time/?ci=2027-05-31&co=2027-06-05": 9957.81,
-    "https://sunnyorangestays.com/properties/island-time/?ci=2027-06-07&co=2027-06-12": 10879.49,
-    "https://sunnyorangestays.com/properties/summer-breeze/?ci=2027-05-31&co=2027-06-05": 9359.35,
-    "https://sunnyorangestays.com/properties/summer-breeze/?ci=2027-06-07&co=2027-06-12": 11370.97,
+    "https://sunnyorangestays.com/properties/island-time/?ci=2027-06-07&co=2027-06-12": 10528.38,
+    "https://sunnyorangestays.com/properties/summer-breeze/?ci=2027-05-31&co=2027-06-05": 9343.51,
+    "https://sunnyorangestays.com/properties/summer-breeze/?ci=2027-06-07&co=2027-06-12": 11406.33,
     "https://www.airbnb.com/rooms/1005043652152471558?adults=8&check_in=2027-05-31&check_out=2027-06-05&guests=6&search_mode=regular_search&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=8&amenities%5B%5D=4&amenities%5B%5D=33&amenities%5B%5D=34&amenities%5B%5D=58&photo_id=1762819634&source_impression_id=p3_1791151807_P3IH1jWqutQjd73B&previous_page_section_name=1001&federated_search_id=eac38a16-67bf-4228-9c15-5f42a9d9928c": 6304.0,
     "https://www.airbnb.com/rooms/1126781564607655572?adults=8&check_in=2027-05-31&check_out=2027-06-05&guests=6&search_mode=regular_search&amenities%5B%5D=7&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=34&amenities%5B%5D=33&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=2189793986&source_impression_id=p3_1791146162_P3_b2qG3LJXVqeZP&previous_page_section_name=1001&federated_search_id=df4ce87b-79f6-452e-bf33-fb0b8188fd31": 12973.0,
     "https://www.airbnb.com/rooms/1126781564607655572?adults=8&check_in=2027-06-07&check_out=2027-06-12&guests=6&search_mode=regular_search&amenities%5B%5D=7&amenities%5B%5D=5&amenities%5B%5D=9&amenities%5B%5D=34&amenities%5B%5D=33&amenities%5B%5D=8&amenities%5B%5D=4&photo_id=2189793986&source_impression_id=p3_1791146248_P3kMNLBr96PLv7Ea&previous_page_section_name=1001&federated_search_id=cad76316-5ad8-402a-bce2-bba466d0416e": 13079.0,
@@ -77,11 +77,11 @@
       "unavailable": 0
     },
     "www.booking.com": {
-      "blocked": 0,
+      "blocked": 1,
       "checked": 2,
       "ok": 0,
       "other_failed": 0,
-      "unavailable": 2
+      "unavailable": 1
     },
     "www.expedia.com": {
       "blocked": 0,
@@ -105,5 +105,5 @@
       "unavailable": 0
     }
   },
-  "updated": "2026-10-11T09:07:27Z"
+  "updated": "2026-10-11T12:08:08Z"
 }
