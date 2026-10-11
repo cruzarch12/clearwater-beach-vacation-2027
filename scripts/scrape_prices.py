@@ -80,7 +80,11 @@ MAX_CONCURRENT = 6
 MAX_PER_HOST = 2
 BREAKER_AFTER = 2
 # Sites that have never blocked us get a slightly higher per-site cap.
-HOST_CAP_OVERRIDE = {"www.airbnb.com": 3}
+HOST_CAP_OVERRIDE = {"www.airbnb.com": 3, "www.vrbo.com": 1}
+# Vrbo gets exactly one try per run: its links run one at a time, and if the
+# first comes back without a price the rest are skipped (it has never given
+# a price from GitHub's servers; any success re-enables the rest).
+BREAKER_AFTER_HOST = {"www.vrbo.com": 1}
 # Debug screenshots of pages that gave no price on the defended sites /
 # Guesty, saved to ./debug/ and uploaded by the workflow as a downloadable
 # artifact (never committed) so the real page can be inspected.
@@ -412,13 +416,19 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
                 if waited >= max_wait_ms:
                     await snap(page)
                     return text
-                if "guestybookings.com" in host and not clicked and waited >= 2500:
+                if "guestybookings.com" in host and not clicked and waited >= 5000:
                     # These pages show "Search for available dates" with the
                     # dates already filled in; the quote only appears once
                     # that Search button is pressed (read-only action).
                     clicked = True
                     try:
-                        await page.get_by_role("button", name="Search", exact=True).first.click(timeout=2000)
+                        btn = page.get_by_role("button", name="Search", exact=True).first
+                        if await btn.is_disabled():
+                            # Greyed-out Search = the widget won't quote these
+                            # dates; the listing is no longer bookable for them.
+                            await snap(page)
+                            return "those dates are not available (booking widget Search button is disabled)"
+                        await btn.click(timeout=2000)
                     except Exception:
                         pass
                 await page.wait_for_timeout(POLL_MS)
@@ -588,7 +598,7 @@ async def main():
             async with hs, sem:
                 t_start = time.monotonic()
                 hard = is_hard_host(u)
-                if hard and fails.get(h, 0) >= BREAKER_AFTER:
+                if hard and fails.get(h, 0) >= BREAKER_AFTER_HOST.get(h, BREAKER_AFTER):
                     statuses[u] = "blocked"
                     blocked.append(u)
                     return
