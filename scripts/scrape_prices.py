@@ -84,7 +84,7 @@ HOST_CAP_OVERRIDE = {"www.airbnb.com": 3}
 # Debug screenshots of pages that gave no price on the defended sites /
 # Guesty, saved to ./debug/ and uploaded by the workflow as a downloadable
 # artifact (never committed) so the real page can be inspected.
-MAX_SHOTS = 4
+MAX_SHOTS = 8
 _shots = []
 # Responses to price/availability-type requests on Vrbo/Expedia pages, for
 # the run log: shows whether the price request was refused (403/429),
@@ -120,6 +120,9 @@ BLOCK_SIGNS = (
     "ddos protection by",
     "attention required",
     "confirm you are human",
+    "show us your human side",
+    "human or a bot",
+    "rate limited (http 429)",
     "verifies that you are not a bot",
 )
 
@@ -327,12 +330,13 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
         return text
 
     async def snap(page):
-        if len(_shots) >= MAX_SHOTS or not (is_hard_host(url) or "guestybookings.com" in host):
+        watched = is_hard_host(url) or any(h in host for h in ("guestybookings.com", "clearwaterbeachvacationhomes.com"))
+        if len(_shots) >= MAX_SHOTS or not watched or any(n.startswith(re.sub(r"[^A-Za-z0-9]+", "_", host)) for n in _shots):
             return
         try:
             out = ROOT / "debug"
             out.mkdir(exist_ok=True)
-            name = re.sub(r"[^A-Za-z0-9]+", "_", host_of(url) + "_" + url[-40:])[:70] + ".png"
+            name = re.sub(r"[^A-Za-z0-9]+", "_", host + "_" + url[-40:])[:70] + ".png"
             await page.screenshot(path=str(out / name), full_page=False)
             _shots.append(name)
         except Exception:
@@ -344,9 +348,12 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
         'unavailable' message appears, or max_wait_ms runs out."""
         page = await context.new_page()
         net = []
+        rate_limited = []
         if is_hard_host(url):
             def _on_resp(r):
                 u_low = r.url.lower()
+                if r.status == 429 and "graphql" in u_low:
+                    rate_limited.append(r.url)
                 if len(net) < 15 and any(k in u_low for k in ("graphql", "price", "quote", "availab", "/api/")):
                     net.append(f"{r.status} {r.url[:110]}")
             page.on("response", _on_resp)
@@ -371,6 +378,13 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
                     text = await read_text(page)
                 except Exception:
                     text = ""
+                if rate_limited and waited >= 3000:
+                    # The site's own price request was refused with HTTP 429
+                    # (Too Many Requests): it is rate-limiting this IP, and
+                    # waiting longer won't produce a price.
+                    net.append("429 -> stopped waiting (price request refused)")
+                    await snap(page)
+                    return "rate limited (HTTP 429) - bot protection refused the price request"
                 if text:
                     if looks_unavailable(text) or date_mismatch(url, text):
                         return text
