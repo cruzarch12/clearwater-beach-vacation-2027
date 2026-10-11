@@ -76,7 +76,7 @@ MIN_WAIT_MS = 1000
 # Parallelism: how many pages in flight overall, and per website. The
 # per-site cap is what matters for avoiding bot flags (they look at repeated
 # hits from one IP to one site); different sites can run side by side.
-MAX_CONCURRENT = 4
+MAX_CONCURRENT = 6
 MAX_PER_HOST = 2
 BREAKER_AFTER = 2
 # Sites that have never blocked us get a slightly higher per-site cap.
