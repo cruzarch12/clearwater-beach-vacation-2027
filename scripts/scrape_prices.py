@@ -48,6 +48,7 @@ import json
 import os
 import re
 import sys
+import time
 from datetime import date, datetime, timezone
 from urllib.parse import parse_qs, urlparse
 from pathlib import Path
@@ -77,7 +78,14 @@ MIN_WAIT_MS = 1000
 # hits from one IP to one site); different sites can run side by side.
 MAX_CONCURRENT = 4
 MAX_PER_HOST = 2
-BREAKER_AFTER = 3
+BREAKER_AFTER = 2
+# Sites that have never blocked us get a slightly higher per-site cap.
+HOST_CAP_OVERRIDE = {"www.airbnb.com": 3}
+# Debug screenshots of pages that gave no price on the defended sites /
+# Guesty, saved to ./debug/ and uploaded by the workflow as a downloadable
+# artifact (never committed) so the real page can be inspected.
+MAX_SHOTS = 4
+_shots = []
 
 SLOW_HOSTS = ("vrbo.com", "booking.com", "guestybookings.com", "expedia.com", "hospitable.com", "clearwaterbeachvacationhomes.com")
 
@@ -310,6 +318,18 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
                     pass
         return text
 
+    async def snap(page):
+        if len(_shots) >= MAX_SHOTS or not (is_hard_host(url) or "guestybookings.com" in host):
+            return
+        try:
+            out = ROOT / "debug"
+            out.mkdir(exist_ok=True)
+            name = re.sub(r"[^A-Za-z0-9]+", "_", host_of(url) + "_" + url[-40:])[:70] + ".png"
+            await page.screenshot(path=str(out / name), full_page=False)
+            _shots.append(name)
+        except Exception:
+            pass
+
     async def attempt(max_wait_ms):
         """Load the page, then poll its text until a price (seen on two
         consecutive polls, so a half-rendered widget can't fool it) or an
@@ -321,6 +341,7 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
             waited = MIN_WAIT_MS
             nudged = False
             clicked = False
+            block_polls = 0
             last_price = None
             text = ""
             while True:
@@ -342,7 +363,18 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
                     if price_now is not None and price_now == last_price:
                         return text
                     last_price = price_now
+                    if price_now is None:
+                        if any(sign in text.lower() for sign in BLOCK_SIGNS):
+                            block_polls += 1
+                            # A real bot-check page rarely clears itself; after a
+                            # few seconds of seeing it, stop waiting.
+                            if block_polls >= 4 and waited >= 4000:
+                                await snap(page)
+                                return text
+                        else:
+                            block_polls = 0
                 if waited >= max_wait_ms:
+                    await snap(page)
                     return text
                 if "guestybookings.com" in host and not clicked and waited >= 2500:
                     # These pages show "Search for available dates" with the
@@ -371,6 +403,8 @@ async def check_one(context, url: str, results: dict, errors: list, blocked: lis
             # A bot-check page won't turn into a price by waiting longer;
             # skip the retry (saves ~10s per blocked link).
             pass
+        elif price is None and is_hard_host(url):
+            pass   # defended sites: a longer wait hasn't helped; don't double the cost
         elif price is None:
             # One retry with a longer settle time before giving up — a
             # slow-rendering price widget (heavy pages like listings with
@@ -507,11 +541,14 @@ async def main():
         # rest of that site's links are skipped for this run instead of
         # spending ~30s each on pages that won't give a price.
         fails: dict = {}
+        timings: dict = {}
+        t_run = time.monotonic()
 
         async def bound_check(u):
             h = host_of(u)
-            hs = host_sems.setdefault(h, asyncio.Semaphore(MAX_PER_HOST))
+            hs = host_sems.setdefault(h, asyncio.Semaphore(HOST_CAP_OVERRIDE.get(h, MAX_PER_HOST)))
             async with hs, sem:
+                t_start = time.monotonic()
                 hard = is_hard_host(u)
                 if hard and fails.get(h, 0) >= BREAKER_AFTER:
                     statuses[u] = "blocked"
@@ -519,6 +556,7 @@ async def main():
                     return
                 target = hard_target if hard else context
                 await check_one(target, u, results, errors, blocked, statuses, unavailable)
+                timings[u] = time.monotonic() - t_start
                 if hard:
                     if statuses.get(u) == "ok":
                         fails[h] = -10**6      # a success disables the breaker
@@ -578,6 +616,12 @@ async def main():
     print("Per-platform results:")
     for h, s in sorted(host_stats.items()):
         print(f"  - {h}: {s['ok']}/{s['checked']} ok, {s['blocked']} blocked, {s['unavailable']} unavailable, {s['other_failed']} other failed")
+    per_host_time = {}
+    for u, sec in timings.items():
+        per_host_time[host_of(u)] = per_host_time.get(host_of(u), 0) + sec
+    print(f"Scrape wall time {time.monotonic() - t_run:.0f}s. Seconds spent per site (summed across links, run partly in parallel):")
+    for h, sec in sorted(per_host_time.items(), key=lambda kv: -kv[1]):
+        print(f"  - {h}: {sec:.0f}s")
     if blocked:
         print("\nBlocked (bot-check/CAPTCHA page returned instead of listing):", file=sys.stderr)
         for u in blocked:
