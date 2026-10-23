@@ -99,7 +99,7 @@ VRBO_WAIT_MS = 30000
 EXPEDIA_WAIT_MS = 12000   # let the "human check" page self-clear
 EXPEDIA_BLOCK_GRACE_MS = 10000
 
-SLOW_HOSTS = ("vrbo.com", "booking.com", "guestybookings.com", "expedia.com", "hospitable.com", "clearwaterbeachvacationhomes.com")
+SLOW_HOSTS = ("vrbo.com", "booking.com", "guestybookings.com", "expedia.com", "hospitable.com", "directstays.com", "clearwaterbeachvacationhomes.com")
 
 # One combined dollar-amount pattern, used differently per platform below.
 MONEY = r"\$[\d,]+(?:\.\d{2})?"
@@ -277,6 +277,13 @@ def parse_price(url: str, page_text: str):
         if want and (not nm or int(nm.group(1)) != want):
             return None
         m = re.search(r"Total\s*(" + MONEY + r")", page_text)
+        return _to_float(m.group(1)) if m else None
+
+    if "directstays.com" in host:
+        # Direct-booking quote panel. Format not yet confirmed against a
+        # live page: prefer "Total $X", else "$X total". Unmatched pages
+        # show up in the run's no-price diagnostics so the rule can be fixed.
+        m = re.search(r"Total\s*:?\s*(" + MONEY + r")", page_text) or re.search(r"(" + MONEY + r")\s*total", page_text, re.I)
         return _to_float(m.group(1)) if m else None
 
     if "guestybookings.com" in host or "thegemmacwb.com" in host:
