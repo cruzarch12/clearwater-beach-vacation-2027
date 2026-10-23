@@ -1051,6 +1051,8 @@ const BEDROOMS_NEEDED_MIN = bedroomsNeededFor(GROUP_SIZE_MIN); // 8
 const BEDROOMS_NEEDED_MAX = bedroomsNeededFor(GROUP_SIZE_MAX); // 9
 
 // What we're trying to keep the total around for a two-house booking.
+const ADULTS = 8;                       // price is divided across 8 adults
+const RANK_LABELS = ['A','B','C'];      // Best Option A / B / C
 const PAIR_BUDGET_MIN = 10000;
 const PAIR_BUDGET_MAX = 11000;
 
@@ -1112,73 +1114,28 @@ function computeRecommendations(){
     .forEach((p,i)=>{ p.idx = i+1; });
   properties.forEach(p=>{ if(!p.hasAnyPrice) p.idx = null; });
 
-  properties.forEach((p) => {
-    // A single property is a "best fit" if EITHER path clears the group:
-    // the host's own stated max occupancy already covers 18+ guests, OR
-    // the property simply has enough private bedrooms (8+) to give every
-    // couple their own room under our bedroom math — a listed "sleeps"
-    // number is often a floor, not a hard ceiling, so bedroom count alone
-    // is enough to count a listing in.
-    p.recommended = ((p.sleeps != null) && (p.sleeps >= GROUP_SIZE_MIN))
-      || ((p.beds != null) && (p.beds >= BEDROOMS_NEEDED_MIN));
-  });
-
-  // Find every same-street pair, score the ones that could plausibly cover
-  // the group, and keep only the best one as "the" recommended pair — so the
-  // page points at one clear answer instead of listing every combination.
-  recommendedPair = (function findRecommendedPair(){
-    const byStreet = {};
-    properties.forEach(p=>{
-      if(!p.street) return; // e.g. Vista Del Mar — a different town, never paired
-      (byStreet[p.street] = byStreet[p.street] || []).push(p);
-    });
-
-    const candidates = [];
-    Object.values(byStreet).forEach(group=>{
-      for(let i=0;i<group.length;i++){
-        for(let j=i+1;j<group.length;j++){
-          const a = group[i], b = group[j];
-          const distanceFt = feetBetween(a.lat,a.lng,b.lat,b.lng);
-          const combinedBeds = a.beds + b.beds;
-          const combinedSleeps = (a.sleeps||0) + (b.sleeps||0);
-          const weeks = {};
-          ['r1','r2'].forEach(key=>{
-            if(a.best[key] && b.best[key]) weeks[key] = a.best[key].price + b.best[key].price;
-          });
-          if(Object.keys(weeks).length === 0) return; // no week both are priced for
-          if(combinedSleeps < GROUP_SIZE_MIN) return;  // wouldn't even cover the group on paper
-          // Only a candidate if at least one week comes in at or under the
-          // budget ceiling — being under $10k is fine, going past $11k isn't.
-          const qualifyingWeeks = Object.entries(weeks).filter(([,price]) => price <= PAIR_BUDGET_MAX);
-          if(qualifyingWeeks.length === 0) return;
-          const cheapestQualifying = Math.min(...qualifyingWeeks.map(([,price])=>price));
-          candidates.push({ a, b, distanceFt, combinedBeds, combinedSleeps, weeks, qualifyingWeeks, cheapestQualifying });
-        }
+  // Best value for the adults: each listing's cheapest confirmed week,
+  // divided by the 8 adults. Lowest price per adult is "Best Option A",
+  // then B, then C. Only listings with a confirmed price are ranked.
+  recommendedPair = null;
+  properties.forEach(p=>{
+    p.rank = null;
+    p.perAdult = null;
+    p.perAdultWeek = null;
+    ['r1','r2'].forEach(k=>{
+      const o = p.best[k];
+      if(o && (p.perAdult == null || o.price / ADULTS < p.perAdult)){
+        p.perAdult = o.price / ADULTS;
+        p.perAdultWeek = k;
       }
     });
-
-    if(!candidates.length) return null;
-
-    // Rank: meeting the real bedroom count beats everything else, then
-    // closer properties, then whichever leaves the most budget headroom for
-    // taxes/fees that aren't in these subtotal prices.
-    candidates.sort((x,y)=>{
-      const bedsTierX = x.combinedBeds >= BEDROOMS_NEEDED_MIN ? 0 : 1;
-      const bedsTierY = y.combinedBeds >= BEDROOMS_NEEDED_MIN ? 0 : 1;
-      if(bedsTierX !== bedsTierY) return bedsTierX - bedsTierY;
-      if(Math.round(x.distanceFt/25) !== Math.round(y.distanceFt/25)) return x.distanceFt - y.distanceFt;
-      return x.cheapestQualifying - y.cheapestQualifying;
-    });
-
-    return candidates[0];
-  })();
-
-  if(recommendedPair){
-    recommendedPair.a.recommendedPairPartner = recommendedPair.b.name;
-    recommendedPair.b.recommendedPairPartner = recommendedPair.a.name;
-    recommendedPair.a.recommendedPairData = recommendedPair;
-    recommendedPair.b.recommendedPairData = recommendedPair;
-  }
+  });
+  properties
+    .filter(p => p.perAdult != null)
+    .sort((x,y) => (x.perAdult - y.perAdult) || x.name.localeCompare(y.name))
+    .slice(0, RANK_LABELS.length)
+    .forEach((p,i)=>{ p.rank = i; });
+  properties.forEach(p=>{ p.recommended = p.rank != null; });
 }
 
 computeRecommendations();
@@ -1299,13 +1256,9 @@ function pairsWithNoteHtml(p){
 }
 
 function recommendedBadgeHtml(p){
-  if(p.recommended){
-    return `<div class="recommended-badge">✓ Best fit for the whole group (${GROUP_SIZE_MIN}+ guests)</div>`;
-  }
-  if(p.recommendedPairPartner){
-    return `<div class="recommended-badge recommended-badge-orange">✓ Best fit for the whole group (${GROUP_SIZE_MIN}+ guests) — together with ${p.recommendedPairPartner}</div>`;
-  }
-  return '';
+  if(p.rank == null) return '';
+  const money = Math.round(p.perAdult).toLocaleString('en-US');
+  return `<div class="recommended-badge">★ Best Option ${RANK_LABELS[p.rank]} · $${money} per adult (${RANGE_LABELS[p.perAdultWeek]})</div>`;
 }
 
 // The popup is a quick-glance preview, not a second copy of the full card —
