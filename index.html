@@ -931,7 +931,7 @@ let livePrices = {};
 // live price yet. An offer whose URL isn't in livePrices (not yet checked,
 // or the last check of it failed/was blocked) is skipped entirely — it
 // never falls back to an old number.
-const MAX_PRICE = 10000;   // weeks priced above this are hidden
+const MAX_PER_ADULT = 1000;   // weeks at or above this per-adult cost are hidden
 function cheapest(offersArr){
   if(!offersArr || !offersArr.length) return null;
   const priced = offersArr
@@ -939,10 +939,10 @@ function cheapest(offersArr){
     .filter(x => typeof x.price === 'number');
   if(!priced.length) return null;
   const best = priced.reduce((a,b) => b.price < a.price ? b : a);
-  // Over the price ceiling: that week isn't shown. A listing with no week
+  // Per-adult cost at/over the ceiling: that week isn't shown. A listing with no week
   // left under the ceiling has no price at all, so the existing rule drops
   // it from the list and the map.
-  if(best.price > MAX_PRICE) return null;
+  if(best.price / ADULTS >= MAX_PER_ADULT) return null;
   // Return the offer object with its live price attached, without mutating
   // the original offer (so re-running this after a refresh never leaves a
   // previous run's price sitting on an object that no longer has one).
