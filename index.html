@@ -304,6 +304,7 @@
     font-weight:600;
     color:var(--ink);
   }
+  .price-row .per-adult{ font-size:.78rem; font-weight:600; color:var(--ink-soft); white-space:nowrap; }
   .price-row .amt{
     font-weight:800;
     color:#000;
@@ -855,7 +856,7 @@ const properties = [
         { platform:"Vrbo", url:"https://www.vrbo.com/515046?chkin=2027-06-07&chkout=2027-06-12&d1=2027-06-07&d2=2027-06-12&startDate=2027-06-07&endDate=2027-06-12&x_pwa=1&rfrr=HSR&pwa_ts=1791061484537&referrerUrl=aHR0cHM6Ly93d3cudnJiby5jb20vSG90ZWwtU2VhcmNo&useRewards=true&adults=8&regionId=553248635976481268&destination=Carlouel%2C%20Clearwater%20Beach%2C%20Florida%2C%20United%20States%20of%20America&destType=BOUNDING_BOX&neighborhoodId=553248635976481268&latLong=28.002338%2C-82.825397&amenities_facilities_group=air_conditioning%2Cparking%2Cinternet_available%2Cclothes_dryer%2Cwasher%2Ctelevision%2Cdishwasher%2Cmicrowave%2Coven%2Cstove&pricing_group=total_price&bedroom_count_gt=4&us_bathroom_count_gt=2&bed_count_ge=5&common_spaces_group=kitchen&searchId=e14a6a52-ad12-4e4c-a60a-712abbfcc746&sort=RECOMMENDED&top_dp=1117&top_cur=USD&userIntent=&selectedRoomType=18978146&selectedRatePlan=00046a53e47c94644177b42d8db1f15371cb&expediaPropertyId=18978146&containsVideo=false" }
       ]
     } },
-  { name:"One-of-a-Kind Coastal Gem (2 Homes)", addr:"1900 Gulf Blvd, Indian Rocks Beach, FL 33785",
+  { name:"Coastal Gem (2 Homes)", addr:"1900 Gulf Blvd, Indian Rocks Beach, FL 33785",
     beds:5, baths:3, amenity:"Pool", sleeps:14, fallback:[27.9016039056634,-82.8480619762282],
     offers:{
       r1:[
@@ -1147,11 +1148,6 @@ function offerRowHtml(key, offer, propName, inPopup){
     return '';
   }
   const highlight = currentFilter === key;
-  const sidePanel = (!inPopup && isEmbeddable(offer.url))
-    ? (inPopup
-        ? `<button class="row-panel-btn" onclick="openDrawer('${encodeURIComponent(offer.url)}','${propName.replace(/'/g,"\\'")}')" title="Open this listing in the side panel without leaving the map">See side panel</button>`
-        : `<button class="row-panel-btn" data-url="${encodeURIComponent(offer.url)}" data-name="${propName.replace(/"/g,'&quot;')}" title="Open this listing in the side panel without leaving the map">See side panel</button>`)
-    : '';
   const safeName = propName.replace(/'/g,"\\'");
   const selectBtn = inPopup
     ? `<button class="btn-select" title="Lock in this property and date range as your family's pick — you'll confirm your name and group size next" onclick="openSelectionModal('${safeName}','${key}',${offer.price})">My Pick</button>`
@@ -1161,12 +1157,12 @@ function offerRowHtml(key, offer, propName, inPopup){
       <span class="date-price-line">
         <span class="date-label">${RANGE_LABELS[key]}</span>
         <span class="amt">${fmt(offer.price)}</span>
+        <span class="per-adult">(${fmt(offer.price / ADULTS)}/adult)</span>
       </span>
       <span class="platform-tag">via ${offer.platform}</span>
     </div>
     <div class="price-row-actions">
       <a class="row-link" href="${offer.url}" target="_blank" rel="noopener">View</a>
-      ${sidePanel}
       ${selectBtn}
     </div>
   </div>`;
