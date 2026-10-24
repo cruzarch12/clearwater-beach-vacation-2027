@@ -1402,7 +1402,7 @@ let pendingSelection = null;
 
 window.openSelectionModal = function(propName, rangeKey, price){
   pendingSelection = { property: propName, dateRange: RANGE_LABELS[rangeKey] || rangeKey, price: price };
-  selectSummary.innerHTML = `You're selecting <strong>${propName}</strong> for <strong>${RANGE_LABELS[rangeKey] || rangeKey}</strong> at <strong>${fmt(price)}</strong>. Confirm with your name and group size below.`;
+  selectSummary.innerHTML = `You're selecting <strong>${propName}</strong> for <strong>${RANGE_LABELS[rangeKey] || rangeKey}</strong> at <strong>${fmt(price)}</strong> (${fmt(price / ADULTS)}/adult). Confirm with your name and group size below.`;
   selectForm.reset();
   document.getElementById('selectAdults').value = 1;
   document.getElementById('selectChildren').value = 0;
@@ -1581,6 +1581,7 @@ async function runPriceCheck(isAuto){
     // whose price isn't in this payload has no confirmed price right now,
     // full stop, even if an earlier check had one.
     livePrices = data.offers || {};
+
     const matched = Object.keys(livePrices).length;
 
     // Prices may have just changed, so recompute which listing(s) have a
